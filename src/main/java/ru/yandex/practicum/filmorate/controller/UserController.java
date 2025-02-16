@@ -20,7 +20,7 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user) {
         log.info("Создание пользователя: {}", user);
         try {
-            user.validate(); // Валидация перед добавлением
+            user.validate();
             users.add(user);
             return ResponseEntity.ok(user);
         } catch (ValidationException e) {
