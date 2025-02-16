@@ -37,6 +37,7 @@ class UserTest {
         user.setEmail("user@example.com");
         user.setLogin("");
         user.setBirthday(LocalDate.of(2000, 1, 1));
+
         Exception exception = assertThrows(ValidationException.class, user::validate);
         assertEquals("Логин не может быть пустым и содержать пробелы.", exception.getMessage());
     }
@@ -46,6 +47,17 @@ class UserTest {
         User user = new User();
         user.setEmail("user@example.com");
         user.setLogin("invalid login");
+        user.setBirthday(LocalDate.of(2000, 1, 1));
+
+        Exception exception = assertThrows(ValidationException.class, user::validate);
+        assertEquals("Логин не может быть пустым и содержать пробелы.", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenLoginIsNull() {
+        User user = new User();
+        user.setEmail("user@example.com");
+        user.setLogin(null);
         user.setBirthday(LocalDate.of(2000, 1, 1));
 
         Exception exception = assertThrows(ValidationException.class, user::validate);
