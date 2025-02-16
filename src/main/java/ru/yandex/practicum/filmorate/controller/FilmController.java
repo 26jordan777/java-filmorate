@@ -32,14 +32,20 @@ public class FilmController {
     @PutMapping("/{id}")
     public ResponseEntity<Film> updateFilm(@PathVariable int id, @RequestBody Film updatedFilm) {
         log.info("Обновление фильма с id: {}", id);
-        for (int i = 0; i < films.size(); i++) {
-            if (films.get(i).getId() == id) {
-                films.set(i, updatedFilm);
-                return ResponseEntity.ok(updatedFilm);
+        try {
+            updatedFilm.validate();
+            for (int i = 0; i < films.size(); i++) {
+                if (films.get(i).getId() == id) {
+                    films.set(i, updatedFilm);
+                    return ResponseEntity.ok(updatedFilm);
+                }
             }
+            log.warn("Фильм с id: {} не найден.", id);
+            return ResponseEntity.notFound().build();
+        } catch (ValidationException e) {
+            log.error("Ошибка валидации при обновлении фильма: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(null);
         }
-        log.warn("Фильм с id: {} не найден.", id);
-        return ResponseEntity.notFound().build();
     }
 
     @GetMapping

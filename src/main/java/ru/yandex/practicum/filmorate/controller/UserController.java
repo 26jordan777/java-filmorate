@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,21 +19,33 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
         log.info("Создание пользователя: {}", user);
-        users.add(user);
-        return ResponseEntity.ok(user);
+        try {
+            user.validate(); // Валидация перед добавлением
+            users.add(user);
+            return ResponseEntity.ok(user);
+        } catch (ValidationException e) {
+            log.error("Ошибка валидации при создании пользователя: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable int id, @RequestBody User updatedUser) {
         log.info("Обновление пользователя с id: {}", id);
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getId() == id) {
-                users.set(i, updatedUser);
-                return ResponseEntity.ok(updatedUser);
+        try {
+            updatedUser.validate();
+            for (int i = 0; i < users.size(); i++) {
+                if (users.get(i).getId() == id) {
+                    users.set(i, updatedUser);
+                    return ResponseEntity.ok(updatedUser);
+                }
             }
+            log.warn("Пользователь с id: {} не найден.", id);
+            return ResponseEntity.notFound().build();
+        } catch (ValidationException e) {
+            log.error("Ошибка валидации при обновлении пользователя: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(null);
         }
-        log.warn("Пользователь с id: {} не найден.", id);
-        return ResponseEntity.notFound().build();
     }
 
     @GetMapping
