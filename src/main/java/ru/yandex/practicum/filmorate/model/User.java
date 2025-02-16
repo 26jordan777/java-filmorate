@@ -17,12 +17,12 @@ public class User {
 
     public void validate() throws ValidationException {
         log.debug("Валидация пользователя: {}", this);
-        if (email == null || email.isEmpty() || !email.contains("@")){
+        if (email == null || email.isEmpty() || !email.contains("@")) {
             log.error("Ошибка валидации: {}", "Электронная почта не может быть пустой и должна содержать символ '@'.");
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ '@'.");
         }
 
-        if (login == null || login.isEmpty() || login.contains(" ")){
+        if (login == null || login.isEmpty() || login.contains(" ")) {
             log.error("Ошибка валидации: {}", "Логин не может быть пустым и содержать пробелы.");
             throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
         }
