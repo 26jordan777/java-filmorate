@@ -4,28 +4,30 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.ValidationException;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
-
-/**
- * Film.
- */
 @Data
 @Slf4j
 public class Film {
-    private int id;
+    private long id;
+    @NotBlank(message = "Название фильма не может быть пустым.")
     private String name;
+    @Size(max = 200, message = "Максимальная длина описания — 200 символов.")
     private String description;
+    @NotNull(message = "Дата релиза не может быть пустой.")
     private LocalDate releaseDate;
-    private int duration;
+    @Min(value = 1, message = "Продолжительность фильма должна быть положительным числом.")
+    private long duration;
 
     public void validate() throws ValidationException {
         log.debug("Валидация фильма: {}", this);
 
         if (name == null || name.isEmpty()) {
-            if (log.isErrorEnabled()) {
-                log.error("Ошибка валидации: {}", "Название фильма не может быть пустым.");
-            }
+            log.error("Ошибка валидации: {}", "Название фильма не может быть пустым.");
             throw new ValidationException("Название фильма не может быть пустым.");
         }
 

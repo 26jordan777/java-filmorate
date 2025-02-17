@@ -2,55 +2,46 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
 
-    private final List<User> users = new ArrayList<>();
+    private final Map<Long, User> users = new HashMap<>();
+    private long counter = 0L;
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         log.info("Создание пользователя: {}", user);
-        try {
-            user.validate();
-            users.add(user);
-            return ResponseEntity.ok(user);
-        } catch (ValidationException e) {
-            log.error("Ошибка валидации при создании пользователя: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(null);
-        }
+        user.setId(++counter);
+        users.put(user.getId(), user);
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable int id, @RequestBody User updatedUser) {
+    public ResponseEntity<User> updateUser(@PathVariable long id, @Valid @RequestBody User updatedUser) {
         log.info("Обновление пользователя с id: {}", id);
-        try {
-            updatedUser.validate();
-            for (int i = 0; i < users.size(); i++) {
-                if (users.get(i).getId() == id) {
-                    users.set(i, updatedUser);
-                    return ResponseEntity.ok(updatedUser);
-                }
-            }
+        if (users.containsKey(id)) {
+            updatedUser.setId(id);
+            users.put(id, updatedUser);
+            return ResponseEntity.ok(updatedUser);
+        } else {
             log.warn("Пользователь с id: {} не найден.", id);
             return ResponseEntity.notFound().build();
-        } catch (ValidationException e) {
-            log.error("Ошибка валидации при обновлении пользователя: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(null);
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<Collection<User>> getAllUsers() {
         log.info("Получение всех пользователей.");
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(users.values());
     }
 }
