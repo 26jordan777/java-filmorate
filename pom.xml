@@ -15,6 +15,10 @@
     <description>filmorate</description>
     <properties>
         <java.version>21</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+
     </properties>
     <dependencies>
         <dependency>
