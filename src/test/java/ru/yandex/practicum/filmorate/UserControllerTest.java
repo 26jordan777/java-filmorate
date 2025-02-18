@@ -47,6 +47,7 @@ class UserControllerTest {
         Exception exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
         assertEquals("Логин не может быть пустым и содержать пробелы.", exception.getMessage());
     }
+
     @Test
     void shouldThrowExceptionWhenCreatingUserWithEmptyEmail() {
         User user = new User();
