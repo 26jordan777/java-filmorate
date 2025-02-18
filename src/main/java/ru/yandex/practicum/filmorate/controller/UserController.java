@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.SneakyThrows;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,8 +19,36 @@ import java.util.Collection;
 public class UserController {
 
     private final Map<Long, User> users = new HashMap<>();
-    private long counter = 0L;
 
+    @SneakyThrows
+    @PostMapping
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+        log.info("Создание пользователя: {}", user);
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
+        validate(user);
+        user.setId(++counter);
+        users.put(user.getId(), user);
+        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping()
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User updatedUser) throws ValidationException {
+        log.info("Обновление пользователя с id: {}", updatedUser.getId());
+        if (!users.containsKey(updatedUser.getId())) {
+            throw new ValidationException("Not found key: " + updatedUser.getId());
+        }
+        validate(updatedUser);
+        users.put(updatedUser.getId(), updatedUser);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @GetMapping
+    public ResponseEntity<Collection<User>> getAllUsers() {
+        log.info("Получение всех пользователей.");
+        return ResponseEntity.ok(users.values());
+    }
 
     public void validate(User user) throws ValidationException {
         log.debug("Валидация пользователя: {}", this);
@@ -48,30 +76,5 @@ public class UserController {
         log.info("Пользователь {} успешно прошел валидацию.", this);
     }
 
-    @SneakyThrows
-    @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        log.info("Создание пользователя: {}", user);
-        validate(user);
-        user.setId(++counter);
-        users.put(user.getId(), user);
-        return ResponseEntity.ok(user);
-    }
-
-    @PutMapping()
-    public ResponseEntity<User> updateUser(@Valid @RequestBody User updatedUser) throws ValidationException {
-        log.info("Обновление пользователя с id: {}", updatedUser.getId());
-        if (!users.containsKey(updatedUser.getId())) {
-            throw new ValidationException("Not found key: " + updatedUser.getId());
-        }
-        validate(updatedUser);
-        users.put(updatedUser.getId(), updatedUser);
-        return ResponseEntity.ok(updatedUser);
-    }
-
-    @GetMapping
-    public ResponseEntity<Collection<User>> getAllUsers() {
-        log.info("Получение всех пользователей.");
-        return ResponseEntity.ok(users.values());
-    }
+    private long counter = 0L;
 }

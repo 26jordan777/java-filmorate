@@ -18,6 +18,33 @@ import java.util.Collection;
 public class FilmController {
 
     private Map<Long, Film> films = new HashMap<>();
+
+    @PostMapping
+    public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) {
+        log.info("Добавление фильма: {}", film);
+        validate(film);
+        film.setId(++counter);
+        films.put(film.getId(), film);
+        return ResponseEntity.ok(film);
+    }
+
+    @PutMapping()
+    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film updatedFilm) {
+        log.info("Обновление фильма с id: {}", updatedFilm.getId());
+        if (!films.containsKey(updatedFilm.getId())) {
+            throw new ValidationException("Not found key: " + updatedFilm.getId());
+        }
+        validate(updatedFilm);
+        films.put(updatedFilm.getId(), updatedFilm);
+        return ResponseEntity.ok(updatedFilm);
+    }
+
+    @GetMapping
+    public ResponseEntity<Collection<Film>> getAllFilms() {
+        log.info("Получение всех фильмов.");
+        return ResponseEntity.ok(films.values());
+    }
+
     private long counter = 0L;
 
     private void validate(Film film) {
@@ -44,31 +71,5 @@ public class FilmController {
         }
 
         log.info("Фильм {} успешно прошел валидацию.", this);
-    }
-
-    @PostMapping
-    public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) {
-        log.info("Добавление фильма: {}", film);
-        validate(film);
-        film.setId(++counter);
-        films.put(film.getId(), film);
-        return ResponseEntity.ok(film);
-    }
-
-    @PutMapping()
-    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film updatedFilm) {
-        log.info("Обновление фильма с id: {}", updatedFilm.getId());
-        if (!films.containsKey(updatedFilm.getId())) {
-            throw new ValidationException("Not found key: " + updatedFilm.getId());
-        }
-        validate(updatedFilm);
-        films.put(updatedFilm.getId(), updatedFilm);
-        return ResponseEntity.ok(updatedFilm);
-    }
-
-    @GetMapping
-    public ResponseEntity<Collection<Film>> getAllFilms() {
-        log.info("Получение всех фильмов.");
-        return ResponseEntity.ok(films.values());
     }
 }
