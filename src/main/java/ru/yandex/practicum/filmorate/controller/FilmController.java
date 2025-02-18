@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import jakarta.validation.ValidationException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +21,7 @@ public class FilmController {
     private Map<Long, Film> films = new HashMap<>();
 
     @PostMapping
-    public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) {
+    public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) throws ValidationException {
         log.info("Добавление фильма: {}", film);
         validate(film);
         film.setId(++counter);
@@ -29,7 +30,7 @@ public class FilmController {
     }
 
     @PutMapping()
-    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film updatedFilm) {
+    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film updatedFilm) throws ValidationException {
         log.info("Обновление фильма с id: {}", updatedFilm.getId());
         if (!films.containsKey(updatedFilm.getId())) {
             throw new ValidationException("Not found key: " + updatedFilm.getId());
@@ -47,7 +48,7 @@ public class FilmController {
 
     private long counter = 0L;
 
-    private void validate(Film film) {
+    private void validate(Film film) throws ValidationException {
         log.debug("Валидация фильма: {}", this);
 
         if (film.getName() == null || film.getName().isEmpty()) {

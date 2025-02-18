@@ -24,9 +24,6 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         log.info("Создание пользователя: {}", user);
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
         validate(user);
         user.setId(++counter);
         users.put(user.getId(), user);
@@ -65,7 +62,7 @@ public class UserController {
 
         if (user.getName() == null || user.getName().isEmpty()) {
             log.error("Ошибка валидации: {}", "Имя пользователя не может быть пустым.");
-            throw new ValidationException("Имя пользователя не может быть пустым.");
+            user.setName(user.getLogin());
         }
 
         if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
