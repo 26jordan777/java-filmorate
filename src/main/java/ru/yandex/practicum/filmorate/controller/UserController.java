@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.SneakyThrows;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.ValidationException;
@@ -47,8 +48,9 @@ public class UserController {
         log.info("Пользователь {} успешно прошел валидацию.", this);
     }
 
+    @SneakyThrows
     @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) throws ValidationException {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         log.info("Создание пользователя: {}", user);
         validate(user);
         user.setId(++counter);
