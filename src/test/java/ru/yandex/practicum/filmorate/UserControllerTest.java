@@ -45,7 +45,7 @@ class UserControllerTest {
         user.setBirthday(LocalDate.of(2000, 1, 1));
 
         Exception exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
-        assertEquals("Логин не может быть пустым и содержать пробелы.", exception.getMessage());
+        assertEquals("Имя пользователя не может быть пустым.", exception.getMessage());
     }
 
     @Test
@@ -60,8 +60,18 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldUpdateUserSuccessfully() throws ValidationException {
+    void shouldThrowExceptionWhenCreatingUserWithInvalidEmail() {
+        User user = new User();
+        user.setEmail("invalid-email");
+        user.setLogin("validLogin");
+        user.setBirthday(LocalDate.of(2000, 1, 1));
 
+        Exception exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
+        assertEquals("Электронная почта не может быть пустой и должна содержать символ '@'.", exception.getMessage());
+    }
+
+    @Test
+    void shouldUpdateUserSuccessfully() throws ValidationException {
         User user = new User();
         user.setEmail("user@example.com");
         user.setLogin("validLogin");
@@ -81,5 +91,17 @@ class UserControllerTest {
         assertEquals(200, response.getStatusCodeValue());
         assertNotNull(response.getBody());
         assertEquals("updated@example.com", response.getBody().getEmail());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingUserWithNonExistentId() {
+        User updatedUser = new User();
+        updatedUser.setId(999);
+        updatedUser.setEmail("updated@example.com");
+        updatedUser.setLogin("validLoginUpdated");
+        updatedUser.setBirthday(LocalDate.of(2000, 1, 1));
+
+        Exception exception = assertThrows(ValidationException.class, () -> userController.updateUser(updatedUser));
+        assertEquals("Not found key: 999", exception.getMessage());
     }
 }
