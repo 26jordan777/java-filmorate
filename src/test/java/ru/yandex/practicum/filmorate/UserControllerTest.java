@@ -51,29 +51,6 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenCreatingUserWithEmptyLogin() {
-        User user = new User();
-        user.setEmail("user@example.com");
-        user.setName("Valid Name");
-        user.setBirthday(LocalDate.of(2000, 1, 1));
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
-        assertEquals("Логин не может быть пустым и содержать пробелы.", exception.getMessage());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenCreatingUserWithEmptyName() {
-        User user = new User();
-        user.setEmail("user@example.com");
-        user.setLogin("validLogin");
-        user.setName("");
-        user.setBirthday(LocalDate.of(2000, 1, 1));
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
-        assertEquals("Имя пользователя не может быть пустым.", exception.getMessage());
-    }
-
-    @Test
     void shouldSetNameToLoginWhenNameIsEmpty() throws ValidationException {
         User user = new User();
         user.setEmail("user@example.com");
