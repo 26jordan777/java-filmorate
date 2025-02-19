@@ -78,7 +78,7 @@ class UserControllerTest {
         User user = new User();
         user.setEmail("user@example.com");
         user.setLogin("validLogin");
-        user.setName(""); 
+        user.setName("");
         user.setBirthday(LocalDate.of(2000, 1, 1));
 
         ResponseEntity<User> response = userController.createUser(user);
