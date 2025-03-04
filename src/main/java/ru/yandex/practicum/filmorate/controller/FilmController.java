@@ -18,7 +18,7 @@ import java.util.Collection;
 @Slf4j
 public class FilmController {
 
-    private Map<Long, Film> films = new HashMap<>();
+    private final Map<Long, Film> films = new HashMap<>();
 
     @PostMapping
     public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) throws ValidationException {
