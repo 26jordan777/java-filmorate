@@ -6,18 +6,18 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-    public  class GlobalExceptionHandler {
+public class GlobalExceptionHandler {
 
-        @ExceptionHandler(ValidationException.class)
-        public ResponseEntity<String> handleValidationException(ValidationException e) {
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<String> handleValidationException(ValidationException e) {
 
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
-        @ExceptionHandler(Exception.class)
-        public ResponseEntity<String> handleGeneralException(Exception e) {
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Произошла ошибка на сервере: " + e.getMessage());
-        }
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGeneralException(Exception e) {
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Произошла ошибка на сервере: " + e.getMessage());
+    }
+}
