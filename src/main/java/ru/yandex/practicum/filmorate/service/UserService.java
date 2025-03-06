@@ -1,15 +1,18 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserService {
     private final UserStorage userStorage;
 
@@ -75,7 +78,7 @@ public class UserService {
                     .collect(Collectors.toList());
         }
         log.warn("Пользователь с ID {} не найден, не удается получить список друзей.", userId);
-        return Collection.emptyList();
+        return Collections.emptyList();
     }
 
     public Collection<User> getCommonFriends(long userId, long otherId) {
@@ -89,6 +92,6 @@ public class UserService {
                     .collect(Collectors.toList());
         }
         log.warn("Не удалось получить общих друзей: один из пользователей не найден.");
-        return Collection.emptyList();
+        return Collections.emptyList();
     }
 }

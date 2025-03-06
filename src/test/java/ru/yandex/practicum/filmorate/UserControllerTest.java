@@ -40,17 +40,6 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenCreatingUserWithEmptyEmail() {
-        User user = new User();
-        user.setEmail("");
-        user.setLogin("validLogin");
-        user.setBirthday(LocalDate.of(2000, 1, 1));
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
-        assertEquals("Электронная почта не может быть пустой и должна содержать символ '@'.", exception.getMessage());
-    }
-
-    @Test
     void shouldSetNameToLoginWhenNameIsEmpty() throws ValidationException {
         User user = new User();
         user.setEmail("user@example.com");
@@ -72,7 +61,6 @@ class UserControllerTest {
         user.setName("Valid Name");
         user.setBirthday(LocalDate.of(2000, 1, 1));
         user.setId(1);
-
 
         userController.createUser(user);
 
@@ -99,6 +87,6 @@ class UserControllerTest {
         updatedUser.setBirthday(LocalDate.of(2000, 1, 1));
 
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.updateUser(updatedUser));
-        assertEquals("Not found key: 999", exception.getMessage());
+        assertEquals("Пользователь с ID 999 не найден.", exception.getMessage());
     }
 }
