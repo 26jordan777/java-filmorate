@@ -1,11 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
 
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -17,6 +20,13 @@ import java.util.Collection;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
+
+    private final FilmService filmService;
+
+    @Autowired
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     private final Map<Long, Film> films = new HashMap<>();
 
@@ -40,10 +50,54 @@ public class FilmController {
         return ResponseEntity.ok(updatedFilm);
     }
 
+    @GetMapping()
+    public ResponseEntity<Film> getFilmById(@PathVariable long id) throws ValidationException {
+        log.info("Получение фильма с ID: {}", id);
+        Film film = films.get(id);
+        if (film == null) {
+            log.error("Фильм с ID {} не найден.", id);
+            throw new ValidationException("Фильм с ID " + id + " не найден.");
+        }
+        return ResponseEntity.ok(film);
+    }
+
     @GetMapping
     public ResponseEntity<Collection<Film>> getAllFilms() {
         log.info("Получение всех фильмов.");
         return ResponseEntity.ok(films.values());
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<Void> deleteFilm(@PathVariable long id) {
+        log.info("Удаление фильма с ID: {}", id);
+        films.remove(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping()
+    public ResponseEntity<Void> addLike(@PathVariable long id, @PathVariable long userId) throws ValidationException {
+        Film film = films.get(id);
+        if (film != null) {
+            film.addLike(userId);
+            log.info("Пользователь с ID {} поставил лайк фильму с ID {}", userId, id);
+            return ResponseEntity.ok().build();
+        } else {
+            log.error("Не удалось поставить лайк: фильм с ID {} не найден.", id);
+            throw new ValidationException("Фильм с ID " + id + " не найден.");
+        }
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<Void> removeLike(@PathVariable long id, @PathVariable long userId) throws ValidationException {
+        Film film = films.get(id);
+        if (film != null) {
+            film.removeLike(userId);
+            log.info("Пользователь с ID {} убрал лайк у фильма с ID {}", userId, id);
+            return ResponseEntity.ok().build();
+        } else {
+            log.error("Не удалось убрать лайк: фильм с ID {} не найден.", id);
+            throw new ValidationException("Фильм с ID " + id + " не найден.");
+        }
     }
 
     private long counter = 0L;
@@ -73,4 +127,5 @@ public class FilmController {
 
         log.info("Фильм {} успешно прошел валидацию.", this);
     }
+
 }

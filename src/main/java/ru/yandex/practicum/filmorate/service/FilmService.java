@@ -21,9 +21,9 @@ public class FilmService {
     }
 
     public Film addFilm(Film film) {
-        Film addedFilm = filmStorage.addFilm(film);
-        log.info("Фильм добавлен: {}", addedFilm);
-        return addedFilm;
+        Film addFilm = filmStorage.addFilm(film);
+        log.info("Фильм добавлен: {}", addFilm);
+        return addFilm;
     }
 
     public Film updateFilm(Film film) {
