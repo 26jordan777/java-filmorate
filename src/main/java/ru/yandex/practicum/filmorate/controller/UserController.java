@@ -40,14 +40,16 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PutMapping()
+    @PutMapping
     public ResponseEntity<User> updateUser(@Valid @RequestBody User updatedUser) throws ValidationException {
-        log.info("Обновление пользователя с id: {}", updatedUser.getId());
+        log.info("Обновление пользователя с ID: {}", updatedUser.getId());
         if (!users.containsKey(updatedUser.getId())) {
-            throw new ValidationException("Not found key: " + updatedUser.getId());
+            log.error("Пользователь с ID {} не найден.", updatedUser.getId());
+            throw new ValidationException("Пользователь с ID " + updatedUser.getId() + " не найден.");
         }
         validate(updatedUser);
         users.put(updatedUser.getId(), updatedUser);
+        log.info("Пользователь обновлен с ID: {}", updatedUser.getId());
         return ResponseEntity.ok(updatedUser);
     }
 
