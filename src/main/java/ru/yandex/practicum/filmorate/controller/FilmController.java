@@ -21,6 +21,7 @@ import java.util.Collection;
 @Slf4j
 public class FilmController {
 
+    @Getter
     private final FilmService filmService;
 
     @Autowired
