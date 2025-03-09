@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,7 +25,7 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldCreateUserSuccessfully() throws ValidationException {
+    void shouldCreateUserSuccessfully()  {
         User user = new User();
         user.setEmail("user@example.com");
         user.setLogin("validLogin");
@@ -40,7 +41,7 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldSetNameToLoginWhenNameIsEmpty() throws ValidationException {
+    void shouldSetNameToLoginWhenNameIsEmpty()  {
         User user = new User();
         user.setEmail("user@example.com");
         user.setLogin("validLogin");
@@ -50,7 +51,7 @@ class UserControllerTest {
         ResponseEntity<User> response = userController.createUser(user);
 
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("validLogin", response.getBody().getName());
+        assertEquals("validLogin", Objects.requireNonNull(response.getBody()).getName());
     }
 
     @Test
