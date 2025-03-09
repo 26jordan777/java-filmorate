@@ -56,7 +56,7 @@ class FilmControllerTest {
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
         updatedFilm.setDuration(130);
 
-        ResponseEntity<Film> response = filmController.updateFilm(updatedFilm);
+        ResponseEntity<Film> response = filmController.updateFilm(1, updatedFilm);
 
         assertEquals(200, response.getStatusCodeValue());
         assertNotNull(response.getBody());

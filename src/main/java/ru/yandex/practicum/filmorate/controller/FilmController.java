@@ -40,6 +40,7 @@ public class FilmController {
             log.error("Фильм с ID {} не найден для обновления.", id);
             throw new ValidationException("Фильм с ID " + id + " не найден.");
         }
+        log.info("Фильм обновлен с ID: {}", id);
         return ResponseEntity.ok(film);
     }
 
