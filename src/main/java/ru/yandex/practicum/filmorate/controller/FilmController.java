@@ -1,27 +1,21 @@
 package ru.yandex.practicum.filmorate.controller;
 
-
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Collection;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-
-    @Getter
     private final FilmService filmService;
 
     @Autowired
@@ -29,32 +23,30 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-    private final Map<Long, Film> films = new HashMap<>();
-
     @PostMapping
     public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) throws ValidationException {
         log.info("Добавление фильма: {}", film);
         validate(film);
-        film.setId(++counter);
-        films.put(film.getId(), film);
+        return ResponseEntity.ok(filmService.addFilm(film));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Film> updateFilm(@PathVariable long id, @Valid @RequestBody Film updatedFilm) throws ValidationException {
+        log.info("Обновление фильма с ID: {}", id);
+        updatedFilm.setId(id);
+        validate(updatedFilm);
+        Film film = filmService.updateFilm(updatedFilm);
+        if (film == null) {
+            log.error("Фильм с ID {} не найден для обновления.", id);
+            throw new ValidationException("Фильм с ID " + id + " не найден.");
+        }
         return ResponseEntity.ok(film);
     }
 
-    @PutMapping()
-    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film updatedFilm) throws ValidationException {
-        log.info("Обновление фильма с id: {}", updatedFilm.getId());
-        if (!films.containsKey(updatedFilm.getId())) {
-            throw new ValidationException("Not found key: " + updatedFilm.getId());
-        }
-        validate(updatedFilm);
-        films.put(updatedFilm.getId(), updatedFilm);
-        return ResponseEntity.ok(updatedFilm);
-    }
-
-    @GetMapping()
+    @GetMapping("/{id}")
     public ResponseEntity<Film> getFilmById(@PathVariable long id) throws ValidationException {
         log.info("Получение фильма с ID: {}", id);
-        Film film = films.get(id);
+        Film film = filmService.getFilmById(id);
         if (film == null) {
             log.error("Фильм с ID {} не найден.", id);
             throw new ValidationException("Фильм с ID " + id + " не найден.");
@@ -65,19 +57,19 @@ public class FilmController {
     @GetMapping
     public ResponseEntity<Collection<Film>> getAllFilms() {
         log.info("Получение всех фильмов.");
-        return ResponseEntity.ok(films.values());
+        return ResponseEntity.ok(filmService.getAllFilms());
     }
 
-    @DeleteMapping()
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFilm(@PathVariable long id) {
         log.info("Удаление фильма с ID: {}", id);
-        films.remove(id);
+        filmService.deleteFilm(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping()
+    @PutMapping("/{id}/like/{userId}")
     public ResponseEntity<Void> addLike(@PathVariable long id, @PathVariable long userId) throws ValidationException {
-        Film film = films.get(id);
+        Film film = filmService.getFilmById(id);
         if (film != null) {
             film.addLike(userId);
             log.info("Пользователь с ID {} поставил лайк фильму с ID {}", userId, id);
@@ -88,9 +80,9 @@ public class FilmController {
         }
     }
 
-    @DeleteMapping()
+    @DeleteMapping("/{id}/like/{userId}")
     public ResponseEntity<Void> removeLike(@PathVariable long id, @PathVariable long userId) throws ValidationException {
-        Film film = films.get(id);
+        Film film = filmService.getFilmById(id);
         if (film != null) {
             film.removeLike(userId);
             log.info("Пользователь с ID {} убрал лайк у фильма с ID {}", userId, id);
@@ -101,32 +93,29 @@ public class FilmController {
         }
     }
 
-    private long counter = 0L;
-
     private void validate(Film film) throws ValidationException {
-        log.debug("Валидация фильма: {}", this);
+        log.debug("Валидация фильма: {}", film);
 
         if (film.getName() == null || film.getName().isEmpty()) {
-            log.error("Ошибка валидации: {}", "Название фильма не может быть пустым.");
+            log.error("Ошибка валидации: Название фильма не может быть пустым.");
             throw new ValidationException("Название фильма не может быть пустым.");
         }
 
         if (film.getDescription() != null && film.getDescription().length() > 200) {
-            log.error("Ошибка валидации: {}", "Максимальная длина описания — 200 символов.");
+            log.error("Ошибка валидации: Максимальная длина описания — 200 символов.");
             throw new ValidationException("Максимальная длина описания — 200 символов.");
         }
 
         if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.error("Ошибка валидации: {}", "Дата релиза не может быть раньше 28 декабря 1895 года.");
+            log.error("Ошибка валидации: Дата релиза не может быть раньше 28 декабря 1895 года.");
             throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года.");
         }
 
         if (film.getDuration() <= 0) {
-            log.error("Ошибка валидации: {}", "Продолжительность фильма должна быть положительным числом.");
+            log.error("Ошибка валидации: Продолжительность фильма должна быть положительным числом.");
             throw new ValidationException("Продолжительность фильма должна быть положительным числом.");
         }
 
-        log.info("Фильм {} успешно прошел валидацию.", this);
+        log.info("Фильм {} успешно прошел валидацию.", film);
     }
-
 }
