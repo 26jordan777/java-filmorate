@@ -37,7 +37,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(120);
 
-        
+
         when(filmService.addFilm(any(Film.class))).thenReturn(film);
 
         ResponseEntity<Film> response = filmController.addFilm(film);
