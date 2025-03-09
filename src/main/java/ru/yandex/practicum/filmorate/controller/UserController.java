@@ -35,8 +35,13 @@ public class UserController {
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         log.info("Создание пользователя: {}", user);
         validate(user);
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+            log.info("Имя пользователя не указано, устанавливается логин как имя.");
+        }
         user.setId(++counter);
         users.put(user.getId(), user);
+        log.info("Пользователь создан с ID: {}", user.getId());
         return ResponseEntity.ok(user);
     }
 
@@ -60,7 +65,7 @@ public class UserController {
     }
 
     public void validate(User user) throws ValidationException {
-        log.debug("Валидация пользователя: {}", this);
+        log.debug("Валидация пользователя: {}", user);
 
         if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
             log.error("Ошибка валидации: {}", "Электронная почта не может быть пустой и должна содержать символ '@'.");
@@ -82,7 +87,7 @@ public class UserController {
             throw new ValidationException("Дата рождения не может быть в будущем.");
         }
 
-        log.info("Пользователь {} успешно прошел валидацию.", this);
+        log.info("Пользователь {} успешно прошел валидацию.", user);
     }
 
     private long counter = 0L;
