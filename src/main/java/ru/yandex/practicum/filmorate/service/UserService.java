@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
@@ -39,8 +38,7 @@ public class UserService {
     public User updateUser(User user) throws ValidationException {
         validateUser(user);
         User updatedUser = userStorage.updateUser(user);
-        if (updatedUser == null) {
-            log.error("Пользователь с ID {} не найден для обновления.", user.getId());
+        if (updatedUser == null) {log.error("Пользователь с ID {} не найден для обновления.", user.getId());
             throw new ValidationException("Пользователь с ID " + user.getId() + " не найден.");
         }
         log.info("Пользователь обновлен: {}", updatedUser);
@@ -56,15 +54,22 @@ public class UserService {
         return userStorage.getAllUsers();
     }
 
-    public List<Long> getFriends(Long userId) throws ValidationException {
+    public List<User> getFriends(Long userId) throws ValidationException {
         User user = userStorage.getUserById(userId);
         if (user == null) {
             throw new ValidationException("Пользователь с ID " + userId + " не найден.");
         }
-        return new ArrayList<>(user.getFriends());
+        List<User> friends = new ArrayList<>();
+        for (Long friendId : user.getFriends()) {
+            User friend = userStorage.getUserById(friendId);
+            if (friend != null) {
+                friends.add(friend);
+            }
+        }
+        return friends;
     }
 
-    public List<Long> getFriendsCommonOther(Long userId, Long otherId) throws ValidationException {
+    public List<User> getFriendsCommonOther(Long userId, Long otherId) throws ValidationException {
         User user = userStorage.getUserById(userId);
         User otherUser = userStorage.getUserById(otherId);
         if (user == null || otherUser == null) {
@@ -72,10 +77,17 @@ public class UserService {
         }
         Set<Long> commonFriendIds = new HashSet<>(user.getFriends());
         commonFriendIds.retainAll(otherUser.getFriends());
-        return new ArrayList<>(commonFriendIds);
+        List<User> commonFriends = new ArrayList<>();
+        for (Long friendId : commonFriendIds) {
+            User commonFriend = userStorage.getUserById(friendId);
+            if (commonFriend != null) {
+                commonFriends.add(commonFriend);
+            }
+        }
+        return commonFriends;
     }
 
-    public List<Long> addFriend(Long userId, Long friendId) throws ValidationException {
+    public List<User> addFriend(Long userId, Long friendId) throws ValidationException {
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
         if (user == null || friend == null) {
@@ -83,7 +95,7 @@ public class UserService {
         }
         user.addFriend(friendId);
         friend.addFriend(userId);
-        return new ArrayList<>(user.getFriends());
+        return getFriends(userId);
     }
 
     public void removeFriend(Long userId, Long friendId) throws ValidationException {

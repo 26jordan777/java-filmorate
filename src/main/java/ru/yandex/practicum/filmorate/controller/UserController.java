@@ -71,7 +71,7 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<User>> getFriendsCommonOther(@PathVariable("id") Long userId,
-                                                            @PathVariable("otherId") Long otherId) {
+                                                            @PathVariable("otherId") Long otherId) throws ValidationException {
         log.info("Вызван метод GET /users/{id}/friends/common/{otherId} с id = {} и otherId = {}", userId, otherId);
         List<User> commonFriends = userService.getFriendsCommonOther(userId, otherId);
         return ResponseEntity.ok(commonFriends);

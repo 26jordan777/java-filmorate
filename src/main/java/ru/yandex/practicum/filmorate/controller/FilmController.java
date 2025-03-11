@@ -23,14 +23,14 @@ public class FilmController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Film> create(@Valid @RequestBody Film film) throws ValidationException {
         log.info("Получен запрос на создание фильма: {}", film.toString());
-        return filmService.addFilm(film);
+        return ResponseEntity.status(HttpStatus.CREATED).body(filmService.addFilm(film));
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Film read(@PathVariable long id) {
+    public ResponseEntity<Film> read(@PathVariable long id) {
         log.info("Получен запрос на получение фильма с идентификатором: {}", id);
-        return filmService.getFilmById(id);
+        return ResponseEntity.ok(filmService.getFilmById(id));
     }
 
     @PutMapping("/{id}")
@@ -38,7 +38,7 @@ public class FilmController {
     public ResponseEntity<Film> update(@PathVariable long id, @Valid @RequestBody Film updatedFilm) throws ValidationException {
         log.info("Обновление фильма с ID: {}", id);
         updatedFilm.setId(id);
-        return filmService.updateFilm(updatedFilm);
+        return ResponseEntity.ok(filmService.updateFilm(updatedFilm));
     }
 
     @DeleteMapping("/{id}")
@@ -50,9 +50,9 @@ public class FilmController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> findAll() {
+    public ResponseEntity<Collection<Film>> findAll() {
         log.info("Получение списка всех фильмов");
-        return filmService.getAllFilms();
+        return ResponseEntity.ok(filmService.getAllFilms());
     }
 
     @PutMapping("/{id}/like/{userId}")
