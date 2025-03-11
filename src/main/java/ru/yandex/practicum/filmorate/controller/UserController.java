@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,22 +24,25 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<User> create(@Valid @RequestBody User user) throws ValidationException {
         log.info("Получен запрос на создание пользователя: {}", user);
-        return userService.addUser(user);
+        User createdUser = userService.addUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public User read(@PathVariable long id) throws ValidationException {
+    public ResponseEntity<User> read(@PathVariable long id) throws ValidationException {
         log.info("Получен запрос на получение пользователя с идентификатором: {}", id);
-        return userService.getUserById(id);
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public User update(@PathVariable long id, @Valid @RequestBody User updatedUser) throws ValidationException {
+    public ResponseEntity<User> update(@PathVariable long id, @Valid @RequestBody User updatedUser) throws ValidationException {
         log.info("Обновление пользователя с ID: {}", id);
         updatedUser.setId(id);
-        return userService.updateUser(updatedUser);
+        User user = userService.updateUser(updatedUser);
+        return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/{id}")
@@ -52,33 +54,36 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<User> findAll() {
+    public ResponseEntity<Collection<User>> findAll() {
         log.info("Получение списка всех пользователей");
-        return userService.getAllUsers();
+        Collection<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}/friends")
     @ResponseStatus(HttpStatus.OK)
-    public List<User> getFriends(@PathVariable("id") Long userId) throws ValidationException {
+    public ResponseEntity<List<User>> getFriends(@PathVariable("id") Long userId) throws ValidationException {
         log.info("Вызван метод GET /users/{id}/friends с id = {}", userId);
-        return userService.getFriends(userId);
+        List<User> userFriends = userService.getFriends(userId);
+        return ResponseEntity.ok(userFriends);
     }
 
-    @SneakyThrows
     @GetMapping("/{id}/friends/common/{otherId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<User> getFriendsCommonOther(@PathVariable("id") Long userId,
-                                            @PathVariable("otherId") Long otherId) {
+    public ResponseEntity<List<User>> getFriendsCommonOther(@PathVariable("id") Long userId,
+                                                            @PathVariable("otherId") Long otherId) {
         log.info("Вызван метод GET /users/{id}/friends/common/{otherId} с id = {} и otherId = {}", userId, otherId);
-        return userService.getFriendsCommonOther(userId, otherId);
+        List<User> commonFriends = userService.getFriendsCommonOther(userId, otherId);
+        return ResponseEntity.ok(commonFriends);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<User> addFriend(@PathVariable("id") Long userId,
-                                @PathVariable("friendId") Long friendId) throws ValidationException {
+    public ResponseEntity<List<User>> addFriend(@PathVariable("id") Long userId,
+                                                @PathVariable("friendId") Long friendId) throws ValidationException {
         log.info("Вызван метод PUT /{id}/friends/{friendId} с id = {} и friendId = {}", userId, friendId);
-        return userService.addFriend(userId, friendId);
+        List<User> userFriends = userService.addFriend(userId, friendId);
+        return ResponseEntity.ok(userFriends);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")

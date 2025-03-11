@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -21,7 +20,7 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
-    public ResponseEntity<Film> addFilm(Film film) throws ValidationException {
+    public Film addFilm(Film film) throws ValidationException {
         validateFilm(film);
         return filmStorage.addFilm(film);
     }
@@ -30,7 +29,7 @@ public class FilmService {
         return filmStorage.getFilmById(id);
     }
 
-    public ResponseEntity<Film> updateFilm(Film updatedFilm) throws ValidationException {
+    public Film updateFilm(Film updatedFilm) throws ValidationException {
         validateFilm(updatedFilm);
         return filmStorage.updateFilm(updatedFilm);
     }
