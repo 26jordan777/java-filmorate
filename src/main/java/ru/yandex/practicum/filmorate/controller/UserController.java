@@ -70,8 +70,7 @@ public class UserController {
 
     @GetMapping("/{id}/friends/common/{otherId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<User>> getFriendsCommonOther(@PathVariable("id") Long userId,
-                                                            @PathVariable("otherId") Long otherId) throws ValidationException {
+    public ResponseEntity<List<User>> getFriendsCommonOther(@PathVariable("id") Long userId, @PathVariable("otherId") Long otherId) throws ValidationException {
         log.info("Вызван метод GET /users/{id}/friends/common/{otherId} с id = {} и otherId = {}", userId, otherId);
         List<User> commonFriends = userService.getFriendsCommonOther(userId, otherId);
         return ResponseEntity.ok(commonFriends);
@@ -79,8 +78,7 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<User>> addFriend(@PathVariable("id") Long userId,
-                                                @PathVariable("friendId") Long friendId) throws ValidationException {
+    public ResponseEntity<List<User>> addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
         log.info("Вызван метод PUT /{id}/friends/{friendId} с id = {} и friendId = {}", userId, friendId);
         List<User> userFriends = userService.addFriend(userId, friendId);
         return ResponseEntity.ok(userFriends);
@@ -88,8 +86,7 @@ public class UserController {
 
     @DeleteMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeFriend(@PathVariable("id") Long userId,
-                             @PathVariable("friendId") Long friendId) throws ValidationException {
+    public void removeFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
         log.info("Вызван метод DELETE /{id}/friends/{friendId} с id = {} и friendId = {}", userId, friendId);
         userService.removeFriend(userId, friendId);
         log.info("Метод DELETE /{id}/friends/{friendId} успешно выполнен");

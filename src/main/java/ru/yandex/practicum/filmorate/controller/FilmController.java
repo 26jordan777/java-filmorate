@@ -22,15 +22,17 @@ public class FilmController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Film> create(@Valid @RequestBody Film film) throws ValidationException {
-        log.info("Получен запрос на создание фильма: {}", film.toString());
-        return ResponseEntity.status(HttpStatus.CREATED).body(filmService.addFilm(film));
+        log.info("Получен запрос на создание фильма: {}", film);
+        Film createdFilm = filmService.addFilm(film);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Film> read(@PathVariable long id) {
+    public ResponseEntity<Film> read(@PathVariable long id) throws ValidationException {
         log.info("Получен запрос на получение фильма с идентификатором: {}", id);
-        return ResponseEntity.ok(filmService.getFilmById(id));
+        Film film = filmService.getFilmById(id);
+        return ResponseEntity.ok(film);
     }
 
     @PutMapping("/{id}")
@@ -38,7 +40,8 @@ public class FilmController {
     public ResponseEntity<Film> update(@PathVariable long id, @Valid @RequestBody Film updatedFilm) throws ValidationException {
         log.info("Обновление фильма с ID: {}", id);
         updatedFilm.setId(id);
-        return ResponseEntity.ok(filmService.updateFilm(updatedFilm));
+        Film film = filmService.updateFilm(updatedFilm);
+        return ResponseEntity.ok(film);
     }
 
     @DeleteMapping("/{id}")
@@ -52,7 +55,8 @@ public class FilmController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Collection<Film>> findAll() {
         log.info("Получение списка всех фильмов");
-        return ResponseEntity.ok(filmService.getAllFilms());
+        Collection<Film> films = filmService.getAllFilms();
+        return ResponseEntity.ok(films);
     }
 
     @PutMapping("/{id}/like/{userId}")
