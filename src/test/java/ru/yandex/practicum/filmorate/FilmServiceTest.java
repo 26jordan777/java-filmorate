@@ -77,7 +77,7 @@ class FilmServiceTest {
 
         when(filmStorage.updateFilm(updatedFilm)).thenReturn(updatedFilm);
 
-        Film responseFilm = filmService.updateFilm(updatedFilm);
+        Film responseFilm = filmService.updateFilm(updatedFilm); 
 
         assertNotNull(responseFilm);
         assertEquals("Updated Film", responseFilm.getName());
@@ -91,6 +91,7 @@ class FilmServiceTest {
         updatedFilm.setDescription("Updated description.");
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
         updatedFilm.setDuration(130);
+
 
         when(filmStorage.updateFilm(updatedFilm)).thenThrow(new ValidationException("Фильм с ID 999 не найден."));
 
