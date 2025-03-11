@@ -38,7 +38,8 @@ public class UserService {
     public User updateUser(User user) throws ValidationException {
         validateUser(user);
         User updatedUser = userStorage.updateUser(user);
-        if (updatedUser == null) {log.error("Пользователь с ID {} не найден для обновления.", user.getId());
+        if (updatedUser == null) {
+            log.error("Пользователь с ID {} не найден для обновления.", user.getId());
             throw new ValidationException("Пользователь с ID " + user.getId() + " не найден.");
         }
         log.info("Пользователь обновлен: {}", updatedUser);
