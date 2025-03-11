@@ -47,7 +47,7 @@ class UserServiceTest {
     @Test
     void shouldThrowExceptionWhenEmailIsInvalid() {
         User user = new User();
-        user.setEmail("invalidEmail"); 
+        user.setEmail("invalidEmail");
         user.setLogin("validLogin");
         user.setBirthday(LocalDate.of(2000, 1, 1));
 
