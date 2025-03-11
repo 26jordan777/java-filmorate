@@ -92,7 +92,6 @@ class FilmServiceTest {
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
         updatedFilm.setDuration(130);
 
-        when(filmStorage.updateFilm(updatedFilm)).thenThrow(new ValidationException("Фильм с ID 999 не найден."));
 
         ValidationException exception = assertThrows(ValidationException.class, () -> filmService.updateFilm(updatedFilm));
         assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
