@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -26,7 +27,7 @@ class FilmControllerTest {
 
     @BeforeEach
     void init() {
-        MockitoAnnotations.openMocks(this); //
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -37,12 +38,11 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(120);
 
-
         when(filmService.addFilm(any(Film.class))).thenReturn(film);
 
-        ResponseEntity<Film> response = filmController.addFilm(film);
+        ResponseEntity<Film> response = filmController.create(film);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.CREATED.value(), response.getStatusCodeValue());
         assertNotNull(response.getBody());
         assertEquals("Valid Film", response.getBody().getName());
     }
@@ -50,17 +50,14 @@ class FilmControllerTest {
     @Test
     void shouldUpdateFilmSuccessfully() throws ValidationException {
         Film film = new Film();
+        film.setId(1);
         film.setName("Initial Film");
         film.setDescription("Initial description.");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(120);
-        film.setId(1);
-
 
         when(filmService.addFilm(any(Film.class))).thenReturn(film);
-
-
-        filmController.addFilm(film);
+        filmController.create(film);
 
         Film updatedFilm = new Film();
         updatedFilm.setId(1);
@@ -69,13 +66,27 @@ class FilmControllerTest {
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
         updatedFilm.setDuration(130);
 
-
         when(filmService.updateFilm(updatedFilm)).thenReturn(updatedFilm);
 
-        ResponseEntity<Film> response = filmController.updateFilm(1, updatedFilm);
+        ResponseEntity<Film> response = filmController.update(updatedFilm);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
         assertNotNull(response.getBody());
         assertEquals("Updated Film", response.getBody().getName());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() {
+        Film updatedFilm = new Film();
+        updatedFilm.setId(999);
+        updatedFilm.setName("Updated Film");
+        updatedFilm.setDescription("Updated description.");
+        updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
+        updatedFilm.setDuration(130);
+
+        when(filmService.updateFilm(updatedFilm)).thenThrow(new ValidationException("Фильм с ID 999 не найден."));
+
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.update(999, updatedFilm));
+        assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
     }
 }

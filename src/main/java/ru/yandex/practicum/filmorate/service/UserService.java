@@ -3,13 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -21,77 +20,88 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public User addUser(User user) {
+    public User addUser(User user) throws ValidationException {
+        validateUser(user);
         User addedUser = userStorage.addUser(user);
         log.info("Пользователь добавлен: {}", addedUser);
         return addedUser;
     }
 
-    public User updateUser(User user) {
+    public User getUserById(long id) throws ValidationException {
+        User user = userStorage.getUserById(id);
+        if (user == null) {
+            log.error("Пользователь с ID {} не найден.", id);
+            throw new ValidationException("Пользователь с ID " + id + " не найден.");
+        }
+        return user;
+    }
+
+    public User updateUser(User user) throws ValidationException {
+        validateUser(user);
         User updatedUser = userStorage.updateUser(user);
+        if (updatedUser == null) {
+            log.error("Пользователь с ID {} не найден для обновления.", user.getId());
+            throw new ValidationException("Пользователь с ID " + user.getId() + " не найден.");
+        }
         log.info("Пользователь обновлен: {}", updatedUser);
         return updatedUser;
     }
 
-    public User getUserById(long id) {
-        User user = userStorage.getUserById(id);
-        if (user == null) {
-            log.error("Пользователь с ID {} не найден.", id);
-        }
-        return user;
+    public void deleteUser(long id) {
+        userStorage.deleteUser(id);
+        log.info("Пользователь с ID {} удален.", id);
     }
 
     public Collection<User> getAllUsers() {
         return userStorage.getAllUsers();
     }
 
-    public void addFriend(long userId, long friendId) {
+    public List<Long> getFriends(Long userId) throws ValidationException {
         User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        if (user != null && friend != null) {
-            user.addFriend(friendId);
-            friend.addFriend(userId);
-            log.info("Пользователь с ID {} добавил в друзья пользователя с ID {}", userId, friendId);
-        } else {
-            log.error("Не удалось добавить в друзья: один из пользователей не найден.");
+        if (user == null) {
+            throw new ValidationException("Пользователь с ID " + userId + " не найден.");
         }
+        return new ArrayList<>(user.getFriends());
     }
 
-    public void removeFriend(long userId, long friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        if (user != null && friend != null) {
-            user.removeFriend(friendId);
-            friend.removeFriend(userId);
-            log.info("Пользователь с ID {} убрал из друзей пользователя с ID {}", userId, friendId);
-        } else {
-            log.error("Не удалось убрать из друзей: один из пользователей не найден.");
-        }
-    }
-
-    public Collection<User> getFriends(long userId) {
-        User user = userStorage.getUserById(userId);
-        if (user != null) {
-            return user.getFriends().stream()
-                    .map(userStorage::getUserById)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-        }
-        log.warn("Пользователь с ID {} не найден, не удается получить список друзей.", userId);
-        return Collections.emptyList();
-    }
-
-    public Collection<User> getCommonFriends(long userId, long otherId) {
+    public List<Long> getFriendsCommonOther(Long userId, Long otherId) throws ValidationException {
         User user = userStorage.getUserById(userId);
         User otherUser = userStorage.getUserById(otherId);
-        if (user != null && otherUser != null) {
-            return user.getFriends().stream()
-                    .filter(otherUser.getFriends()::contains)
-                    .map(userStorage::getUserById)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+        if (user == null || otherUser == null) {
+            throw new ValidationException("Один из пользователей не найден.");
         }
-        log.warn("Не удалось получить общих друзей: один из пользователей не найден.");
-        return Collections.emptyList();
+        Set<Long> commonFriendIds = new HashSet<>(user.getFriends());
+        commonFriendIds.retainAll(otherUser.getFriends());
+        return new ArrayList<>(commonFriendIds);
+    }
+
+    public List<Long> addFriend(Long userId, Long friendId) throws ValidationException {
+        User user = userStorage.getUserById(userId);
+        User friend = userStorage.getUserById(friendId);
+        if (user == null || friend == null) {
+            throw new ValidationException("Один из пользователей не найден.");
+        }
+        user.addFriend(friendId);
+        friend.addFriend(userId);
+        return new ArrayList<>(user.getFriends());
+    }
+
+    public void removeFriend(Long userId, Long friendId) throws ValidationException {
+        User user = userStorage.getUserById(userId);
+        User friend = userStorage.getUserById(friendId);
+        if (user == null || friend == null) {
+            throw new ValidationException("Один из пользователей не найден.");
+        }
+        user.removeFriend(friendId);
+        friend.removeFriend(userId);
+    }
+
+    private void validateUser(User user) throws ValidationException {
+        if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
+            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ '@'.");
+        }
+        if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
+            throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
+        }
     }
 }

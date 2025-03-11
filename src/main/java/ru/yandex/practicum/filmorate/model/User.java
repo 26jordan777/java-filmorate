@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
@@ -13,16 +12,19 @@ import java.util.Set;
 @Data
 @Slf4j
 public class User {
-    @Getter
     private long id;
+
     @NotBlank(message = "Электронная почта не может быть пустой и должна содержать символ '@'.")
     private String email;
+
     @NotBlank(message = "Логин не может быть пустым и содержать пробелы.")
     private String login;
-    @Getter
+
     private String name;
+
     @NotNull(message = "Дата рождения не может быть пустой.")
     private LocalDate birthday;
+
     private Set<Long> friends = new HashSet<>();
 
     public void addFriend(long friendId) {
