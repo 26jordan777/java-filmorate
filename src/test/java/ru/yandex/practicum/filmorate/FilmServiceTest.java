@@ -38,9 +38,9 @@ class FilmServiceTest {
 
         when(filmStorage.addFilm(any(Film.class))).thenReturn(film);
 
-        Film addedFilm = filmService.addFilm(film).getBody();
+        Film addedFilm = filmService.addFilm(film);
         assertNotNull(addedFilm);
-        assertEquals("Valid Film", addedFilm.getName());
+        assertEquals("Valid Film", addedFilm.getName()); 
         verify(filmStorage, times(1)).addFilm(film);
     }
 
@@ -54,5 +54,47 @@ class FilmServiceTest {
 
         ValidationException exception = assertThrows(ValidationException.class, () -> filmService.addFilm(film));
         assertEquals("Название фильма не может быть пустым.", exception.getMessage());
+    }
+
+    @Test
+    void shouldUpdateFilmSuccessfully() throws ValidationException {
+        Film film = new Film();
+        film.setId(1);
+        film.setName("Initial Film");
+        film.setDescription("Initial description.");
+        film.setReleaseDate(LocalDate.of(2000, 1, 1));
+        film.setDuration(120);
+
+        when(filmStorage.addFilm(any(Film.class))).thenReturn(film);
+        filmService.addFilm(film);
+
+        Film updatedFilm = new Film();
+        updatedFilm.setId(1);
+        updatedFilm.setName("Updated Film");
+        updatedFilm.setDescription("Updated description.");
+        updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
+        updatedFilm.setDuration(130);
+
+        when(filmStorage.updateFilm(updatedFilm)).thenReturn(updatedFilm);
+
+        Film responseFilm = filmService.updateFilm(updatedFilm);
+
+        assertNotNull(responseFilm);
+        assertEquals("Updated Film", responseFilm.getName());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() {
+        Film updatedFilm = new Film();
+        updatedFilm.setId(999);
+        updatedFilm.setName("Updated Film");
+        updatedFilm.setDescription("Updated description.");
+        updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
+        updatedFilm.setDuration(130);
+
+        when(filmStorage.updateFilm(updatedFilm)).thenThrow(new ValidationException("Фильм с ID 999 не найден."));
+
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmService.updateFilm(updatedFilm));
+        assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
     }
 }

@@ -68,7 +68,7 @@ class FilmControllerTest {
 
         when(filmService.updateFilm(updatedFilm)).thenReturn(updatedFilm);
 
-        ResponseEntity<Film> response = filmController.update(updatedFilm);
+        ResponseEntity<Film> response = filmController.update(1, updatedFilm);
 
         assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
         assertNotNull(response.getBody());
@@ -76,7 +76,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() {
+    void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() throws ValidationException {
         Film updatedFilm = new Film();
         updatedFilm.setId(999);
         updatedFilm.setName("Updated Film");
