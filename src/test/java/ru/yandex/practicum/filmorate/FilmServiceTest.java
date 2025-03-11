@@ -40,7 +40,7 @@ class FilmServiceTest {
 
         Film addedFilm = filmService.addFilm(film);
         assertNotNull(addedFilm);
-        assertEquals("Valid Film", addedFilm.getName()); 
+        assertEquals("Valid Film", addedFilm.getName());
         verify(filmStorage, times(1)).addFilm(film);
     }
 
