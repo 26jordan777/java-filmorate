@@ -47,7 +47,7 @@ class FilmServiceTest {
     @Test
     void shouldThrowExceptionWhenFilmNameIsEmpty() {
         Film film = new Film();
-        film.setName(""); 
+        film.setName("");
         film.setDescription("A valid description.");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(120);
