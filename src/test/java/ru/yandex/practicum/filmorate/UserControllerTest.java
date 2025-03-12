@@ -80,6 +80,7 @@ class UserControllerTest {
         ResponseEntity<List<User>> response = userController.addFriend(userId, friendId);
         assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
     }
+
     @SneakyThrows
     @Test
     void shouldThrowExceptionWhenUpdatingUserWithNonExistentId() {
