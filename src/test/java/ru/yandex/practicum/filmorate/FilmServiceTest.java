@@ -66,6 +66,7 @@ class FilmServiceTest {
         film.setDuration(120);
 
         when(filmStorage.addFilm(any(Film.class))).thenReturn(film);
+        when(filmStorage.getFilmById(1)).thenReturn(film);
         filmService.addFilm(film);
 
         Film updatedFilm = new Film();
