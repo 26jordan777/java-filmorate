@@ -38,11 +38,16 @@ public class UserController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<User> update(@PathVariable long id, @Valid @RequestBody User updatedUser) throws ValidationException {
+    public ResponseEntity<User> update(@PathVariable long id, @Valid @RequestBody User updatedUser) {
         log.info("Обновление пользователя с ID: {}", id);
         updatedUser.setId(id);
-        User user = userService.updateUser(updatedUser);
-        return ResponseEntity.ok(user);
+        try {
+            User user = userService.updateUser(updatedUser);
+            return ResponseEntity.ok(user);
+        } catch (ValidationException e) {
+            log.error("Ошибка при обновлении пользователя: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     @DeleteMapping("/{id}")
