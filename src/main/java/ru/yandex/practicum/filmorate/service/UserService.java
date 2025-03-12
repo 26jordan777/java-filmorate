@@ -116,8 +116,5 @@ public class UserService {
         if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
             throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
         }
-        if (user.getName() == null || user.getName().isEmpty()) {
-            throw new ValidationException("Имя не может быть пустым.");
-        }
     }
 }
