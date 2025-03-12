@@ -77,8 +77,12 @@ class UserControllerTest {
         when(userService.getUserById(userId)).thenReturn(user);
         when(userService.getUserById(friendId)).thenReturn(friend);
 
-        ResponseEntity<List<User>> response = userController.addFriend(userId, friendId);
+        doNothing().when(userService).addFriend(userId, friendId);
+
+        ResponseEntity<Void> response = userController.addFriend(userId, friendId);
+
         assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
+        verify(userService, times(1)).addFriend(userId, friendId);
     }
 
     @SneakyThrows
