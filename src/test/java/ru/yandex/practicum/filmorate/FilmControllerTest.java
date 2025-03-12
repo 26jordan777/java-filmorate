@@ -85,7 +85,7 @@ class FilmControllerTest {
         updatedFilm.setDuration(130);
 
         when(filmService.updateFilm(updatedFilm)).thenThrow(new ValidationException("Фильм с ID 999 не найден."));
-        
+
         ValidationException exception = assertThrows(ValidationException.class, () -> filmController.update(999, updatedFilm));
         assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
     }
