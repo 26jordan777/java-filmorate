@@ -41,11 +41,14 @@ public class UserService {
 
     public User updateUser(User user) throws ValidationException {
         validateUser(user);
-        User updatedUser = userStorage.updateUser(user);
-        if (updatedUser == null) {
+
+        User existingUser = userStorage.getUserById(user.getId());
+        if (existingUser == null) {
             log.error("Пользователь с ID {} не найден для обновления.", user.getId());
             throw new ValidationException("Пользователь с ID " + user.getId() + " не найден.");
         }
+
+        User updatedUser = userStorage.updateUser(user);
         log.info("Пользователь обновлен: {}", updatedUser);
         return updatedUser;
     }
@@ -105,16 +108,15 @@ public class UserService {
     }
 
     private void validateUser(User user) throws ValidationException {
+        if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
+            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ '@'.");
+        }
         if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
             throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
         }
         if (user.getBirthday() == null) {
             throw new ValidationException("Дата рождения не может быть пустой.");
         }
-        if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ '@'.");
-        }
-
     }
 
     public void addFriend(Long userId, Long friendId) throws ValidationException {
