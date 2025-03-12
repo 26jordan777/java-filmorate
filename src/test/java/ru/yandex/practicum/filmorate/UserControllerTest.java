@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -48,6 +49,37 @@ class UserControllerTest {
         assertEquals("validLogin", response.getBody().getLogin());
     }
 
+    @Test
+    void shouldUpdateUserSuccessfully() throws ValidationException {
+        User updatedUser = new User();
+        updatedUser.setId(1);
+        updatedUser.setEmail("updated@example.com");
+        updatedUser.setLogin("validLoginUpdated");
+        updatedUser.setBirthday(LocalDate.of(2000, 1, 1));
+
+        when(userService.updateUser(updatedUser)).thenReturn(updatedUser);
+
+        ResponseEntity<User> response = userController.update(1, updatedUser);
+        assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
+        assertEquals("updated@example.com", response.getBody().getEmail());
+    }
+
+    @Test
+    void shouldAddFriendSuccessfully() throws ValidationException {
+        Long userId = 1L;
+        Long friendId = 2L;
+
+        User user = new User();
+        user.setId(userId);
+        User friend = new User();
+        friend.setId(friendId);
+
+        when(userService.getUserById(userId)).thenReturn(user);
+        when(userService.getUserById(friendId)).thenReturn(friend);
+
+        ResponseEntity<List<User>> response = userController.addFriend(userId, friendId);
+        assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
+    }
     @SneakyThrows
     @Test
     void shouldThrowExceptionWhenUpdatingUserWithNonExistentId() {
