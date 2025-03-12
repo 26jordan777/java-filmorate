@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -38,7 +37,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<User> update(@PathVariable long id, @Valid @RequestBody User updatedUser) throws ValidationException {
         log.info("Обновление пользователя с ID: {}", id);
@@ -56,14 +55,8 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Collection<User>> findAll() {
-        log.info("Получение списка всех пользователей");
-        Collection<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
-    }
-
-    @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
+        log.info("Получение списка всех пользователей");
         List<User> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
@@ -87,18 +80,16 @@ public class UserController {
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
-        log.info("Вызван метод PUT /{id}/friends/{friendId} с id = {} и friendId = {}", userId, friendId);
-
+        log.info("Вызван метод PUT /users/{id}/friends/{friendId} с id = {} и friendId = {}", userId, friendId);
         userService.addFriend(userId, friendId);
-
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
-        log.info("Вызван метод DELETE /{id}/friends/{friendId} с id = {} и friendId = {}", userId, friendId);
+        log.info("Вызван метод DELETE /users/{id}/friends/{friendId} с id = {} и friendId = {}", userId, friendId);
         userService.removeFriend(userId, friendId);
-        log.info("Метод DELETE /{id}/friends/{friendId} успешно выполнен");
+        log.info("Метод DELETE /users/{id}/friends/{friendId} успешно выполнен");
     }
 }
