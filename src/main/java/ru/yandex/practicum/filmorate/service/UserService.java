@@ -5,8 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -56,7 +55,7 @@ public class UserService {
         log.info("Пользователь с ID {} удален.", id);
     }
 
-    public Collection<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userStorage.getAllUsers();
     }
 
@@ -93,16 +92,6 @@ public class UserService {
         return commonFriends;
     }
 
-    @PutMapping("/{userId}/friends/{friendId}")
-    public ResponseEntity<Void> addFriend(@PathVariable Long userId, @PathVariable Long friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        if (user == null || friend == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Один из пользователей не найден.");
-        }
-        user.addFriend(friendId);
-        return ResponseEntity.ok().build();
-    }
 
     public ResponseEntity<Void> removeFriend(Long userId, Long friendId) {
         User user = userStorage.getUserById(userId);
@@ -125,5 +114,20 @@ public class UserService {
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ '@'.");
         }
 
+    }
+
+    public void addFriend(Long userId, Long friendId) throws ValidationException {
+        User user = userStorage.getUserById(userId);
+        User friend = userStorage.getUserById(friendId);
+
+        if (user == null) {
+            throw new ValidationException("Пользователь с ID " + userId + " не найден.");
+        }
+        if (friend == null) {
+            throw new ValidationException("Пользователь с ID " + friendId + " не найден.");
+        }
+
+        user.addFriend(friendId);
+        userStorage.updateUser(user);
     }
 }

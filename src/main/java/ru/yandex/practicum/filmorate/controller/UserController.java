@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +15,12 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/users")
-@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -60,6 +62,12 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
     @GetMapping("/{id}/friends")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<User>> getFriends(@PathVariable("id") Long userId) throws ValidationException {
@@ -78,10 +86,12 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<User>> addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
+    public ResponseEntity<Void> addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
         log.info("Вызван метод PUT /{id}/friends/{friendId} с id = {} и friendId = {}", userId, friendId);
-        List<User> userFriends = userService.addFriend(userId, friendId);
-        return ResponseEntity.ok(userFriends);
+
+        userService.addFriend(userId, friendId);
+
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
