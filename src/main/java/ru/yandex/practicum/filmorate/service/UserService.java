@@ -56,7 +56,8 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        return userStorage.getAllUsers();
+        Collection<User> users = userStorage.getAllUsers();
+        return new ArrayList<>(users);
     }
 
     public List<User> getFriends(Long userId) throws ValidationException {
