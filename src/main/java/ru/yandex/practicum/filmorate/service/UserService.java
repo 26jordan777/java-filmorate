@@ -2,11 +2,17 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -88,33 +94,37 @@ public class UserService {
         return commonFriends;
     }
 
-    public List<User> addFriend(Long userId, Long friendId) throws ValidationException {
+    @PutMapping("/{userId}/friends/{friendId}")
+    public ResponseEntity<Void> addFriend(@PathVariable Long userId, @PathVariable Long friendId) {
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
         if (user == null || friend == null) {
-            throw new ValidationException("Один из пользователей не найден.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Один из пользователей не найден.");
         }
         user.addFriend(friendId);
-        friend.addFriend(userId);
-        return getFriends(userId);
+        return ResponseEntity.ok().build();
     }
 
-    public void removeFriend(Long userId, Long friendId) throws ValidationException {
+    public ResponseEntity<Void> removeFriend(Long userId, Long friendId) {
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
         if (user == null || friend == null) {
-            throw new ValidationException("Один из пользователей не найден.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Один из пользователей не найден.");
         }
         user.removeFriend(friendId);
-        friend.removeFriend(userId);
+        return ResponseEntity.ok().build();
     }
 
     private void validateUser(User user) throws ValidationException {
-        if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ '@'.");
-        }
         if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
             throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
         }
+        if (user.getBirthday() == null) {
+            throw new ValidationException("Дата рождения не может быть пустой.");
+        }
+        if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
+            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ '@'.");
+        }
+
     }
 }
