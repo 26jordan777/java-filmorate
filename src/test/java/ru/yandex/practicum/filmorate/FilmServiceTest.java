@@ -57,7 +57,7 @@ class FilmServiceTest {
     @Test
     void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() {
         Film updatedFilm = new Film();
-        updatedFilm.setId(999); 
+        updatedFilm.setId(999);
         updatedFilm.setName("Updated Film");
         updatedFilm.setDescription("Updated description.");
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
