@@ -46,8 +46,8 @@ public class FilmController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм с ID " + updatedFilm.getId() + " не найден.");
         }
 
-        filmService.updateFilm(updatedFilm);
-        return ResponseEntity.ok(updatedFilm);
+        Film updatedFilmResponse = filmService.updateFilm(updatedFilm);
+        return ResponseEntity.ok(updatedFilmResponse);
     }
 
     @DeleteMapping("/{id}")

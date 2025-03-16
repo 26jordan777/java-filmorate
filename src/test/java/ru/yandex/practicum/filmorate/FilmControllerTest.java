@@ -7,11 +7,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
 
@@ -25,7 +25,9 @@ class FilmControllerTest {
 
     @Mock
     private FilmService filmService;
-    private FilmStorage filmStorage;
+
+    @Mock
+    private FilmService filmStorage;
 
     @BeforeEach
     void init() {
@@ -33,7 +35,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void shouldAddFilmSuccessfully() throws ValidationException {
+    void shouldCreateFilmSuccessfully() throws ValidationException {
         Film film = new Film();
         film.setName("Valid Film");
         film.setDescription("A valid description.");
@@ -43,46 +45,30 @@ class FilmControllerTest {
         when(filmService.addFilm(any(Film.class))).thenReturn(film);
 
         ResponseEntity<Film> response = filmController.create(film);
-
         assertEquals(HttpStatus.CREATED.value(), response.getStatusCodeValue());
         assertNotNull(response.getBody());
         assertEquals("Valid Film", response.getBody().getName());
     }
 
     @Test
-    void shouldUpdateFilmSuccessfully() throws ValidationException {
-        Film film = new Film();
-        film.setId(1);
-        film.setName("Initial Film");
-        film.setDescription("Initial description.");
-        film.setReleaseDate(LocalDate.of(2000, 1, 1));
-        film.setDuration(120);
-
-
-        when(filmService.addFilm(any(Film.class))).thenReturn(film);
-        when(filmService.getFilmById(1)).thenReturn(film);
-
-        filmService.addFilm(film);
-
+    void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() throws ValidationException {
         Film updatedFilm = new Film();
-        updatedFilm.setId(1);
+        updatedFilm.setId(999);
         updatedFilm.setName("Updated Film");
         updatedFilm.setDescription("Updated description.");
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
         updatedFilm.setDuration(130);
 
+        when(filmService.updateFilm(updatedFilm)).thenThrow(new ValidationException("Фильм с ID 999 не найден."));
 
-        when(filmService.updateFilm(updatedFilm)).thenReturn(updatedFilm);
-
-        Film responseFilm = filmService.updateFilm(updatedFilm);
-
-
-        assertNotNull(responseFilm);
-        assertEquals("Updated Film", responseFilm.getName());
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
+            filmController.update(updatedFilm.getId(), updatedFilm);
+        });
+        assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
     }
 
     @Test
-    void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() {
+    void shouldUpdateFilmSuccessfully() throws ValidationException {
         Film updatedFilm = new Film();
         updatedFilm.setId(999);
         updatedFilm.setName("Updated Film");
@@ -92,10 +78,37 @@ class FilmControllerTest {
 
         when(filmStorage.getFilmById(updatedFilm.getId())).thenReturn(null);
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            filmService.updateFilm(updatedFilm);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            filmController.update(updatedFilm);
         });
 
-        assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        assertEquals("Фильм с ID 999 не найден.", exception.getReason());
+    }
+
+    @Test
+    void shouldReturnFilmById() throws ValidationException {
+        Film film = new Film();
+        film.setId(1);
+        film.setName("Valid Film");
+        film.setDescription("A valid description.");
+        film.setReleaseDate(LocalDate.of(2000, 1, 1));
+        film.setDuration(120);
+
+        when(filmService.getFilmById(1)).thenReturn(film);
+
+        ResponseEntity<Film> response = filmController.read(1);
+        assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        assertEquals("Valid Film", response.getBody().getName());
+    }
+
+    @Test
+    void shouldDeleteFilmSuccessfully() {
+        long filmId = 1L;
+        doNothing().when(filmService).deleteFilm(filmId);
+
+        ResponseEntity<Void> response = filmController.delete(filmId);
+        assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatusCodeValue());
     }
 }
