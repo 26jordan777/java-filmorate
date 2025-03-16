@@ -58,7 +58,6 @@ class FilmServiceTest {
 
     @Test
     void shouldUpdateFilmSuccessfully() throws ValidationException {
-
         Film film = new Film();
         film.setId(1);
         film.setName("Initial Film");
@@ -66,7 +65,10 @@ class FilmServiceTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(120);
 
+        when(filmStorage.addFilm(any(Film.class))).thenReturn(film);
         when(filmStorage.getFilmById(1)).thenReturn(film);
+
+        filmService.addFilm(film);
 
         Film updatedFilm = new Film();
         updatedFilm.setId(1);
@@ -81,5 +83,23 @@ class FilmServiceTest {
 
         assertNotNull(responseFilm);
         assertEquals("Updated Film", responseFilm.getName());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() {
+        Film updatedFilm = new Film();
+        updatedFilm.setId(999);
+        updatedFilm.setName("Updated Film");
+        updatedFilm.setDescription("Updated description.");
+        updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
+        updatedFilm.setDuration(130);
+
+        when(filmStorage.getFilmById(updatedFilm.getId())).thenReturn(null);
+
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
+            filmService.updateFilm(updatedFilm);
+        });
+
+        assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
     }
 }
