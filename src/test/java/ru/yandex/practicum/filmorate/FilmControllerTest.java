@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
 
@@ -24,6 +25,7 @@ class FilmControllerTest {
 
     @Mock
     private FilmService filmService;
+    private FilmStorage filmStorage;
 
     @BeforeEach
     void init() {
@@ -82,20 +84,18 @@ class FilmControllerTest {
     @Test
     void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() {
         Film updatedFilm = new Film();
-        updatedFilm.setId(999);
+        updatedFilm.setId(999); // Неизвестный ID
         updatedFilm.setName("Updated Film");
         updatedFilm.setDescription("Updated description.");
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
         updatedFilm.setDuration(130);
 
-
-        when(filmService.getFilmById(updatedFilm.getId())).thenReturn(null);
-
+        when(filmStorage.getFilmById(updatedFilm.getId())).thenReturn(null);
 
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             filmService.updateFilm(updatedFilm);
         });
+
         assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
     }
-
 }

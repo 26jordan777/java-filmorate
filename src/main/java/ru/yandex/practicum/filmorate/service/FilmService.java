@@ -46,8 +46,9 @@ public class FilmService {
     public Film updateFilm(Film updatedFilm) throws ValidationException {
         Film existingFilm = filmStorage.getFilmById(updatedFilm.getId());
         if (existingFilm == null) {
-            throw new ResourceNotFoundException("Фильм с ID " + updatedFilm.getId() + " не найден.");
+            throw new ValidationException("Фильм с ID " + updatedFilm.getId() + " не найден.");
         }
+
         validateFilm(updatedFilm);
 
         return filmStorage.updateFilm(updatedFilm);
