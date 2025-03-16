@@ -58,6 +58,7 @@ class FilmServiceTest {
 
     @Test
     void shouldUpdateFilmSuccessfully() throws ValidationException {
+
         Film film = new Film();
         film.setId(1);
         film.setName("Initial Film");
@@ -65,9 +66,7 @@ class FilmServiceTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(120);
 
-        when(filmStorage.addFilm(any(Film.class))).thenReturn(film);
-        when(filmStorage.getFilmById(film.getId())).thenReturn(film);
-        filmService.addFilm(film);
+        when(filmStorage.getFilmById(1)).thenReturn(film);
 
         Film updatedFilm = new Film();
         updatedFilm.setId(1);
