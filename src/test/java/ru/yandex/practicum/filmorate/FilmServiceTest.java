@@ -38,7 +38,9 @@ class FilmServiceTest {
         film.setDuration(120);
 
         when(filmStorage.getFilmById(1)).thenReturn(film);
+
         when(filmStorage.updateFilm(any(Film.class))).thenReturn(film);
+
         Film updatedFilm = new Film();
         updatedFilm.setId(1);
         updatedFilm.setName("Updated Film");
@@ -55,7 +57,7 @@ class FilmServiceTest {
     @Test
     void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() {
         Film updatedFilm = new Film();
-        updatedFilm.setId(999); // Неизвестный ID
+        updatedFilm.setId(999); 
         updatedFilm.setName("Updated Film");
         updatedFilm.setDescription("Updated description.");
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
