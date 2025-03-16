@@ -68,7 +68,7 @@ class FilmControllerTest {
 
         when(filmService.updateFilm(updatedFilm)).thenReturn(updatedFilm);
 
-        ResponseEntity<Film> response = filmController.update(1, updatedFilm);
+        ResponseEntity<Film> response = filmController.update( updatedFilm);
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
@@ -86,7 +86,7 @@ class FilmControllerTest {
 
         when(filmService.updateFilm(updatedFilm)).thenThrow(new ValidationException("Фильм с ID 999 не найден."));
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.update(999, updatedFilm));
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.update( updatedFilm));
         assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
     }
 }
