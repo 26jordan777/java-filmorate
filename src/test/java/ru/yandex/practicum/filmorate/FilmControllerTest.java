@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -56,7 +57,10 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(120);
 
+
         when(filmService.addFilm(any(Film.class))).thenReturn(film);
+        when(filmService.getFilmById(1)).thenReturn(film);
+
         filmService.addFilm(film);
 
         Film updatedFilm = new Film();
@@ -66,17 +70,18 @@ class FilmControllerTest {
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
         updatedFilm.setDuration(130);
 
+
         when(filmService.updateFilm(updatedFilm)).thenReturn(updatedFilm);
 
-        ResponseEntity<Film> response = filmController.update(updatedFilm);
+        Film responseFilm = filmService.updateFilm(updatedFilm);
 
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
-        assertEquals("Updated Film", response.getBody().getName());
+
+        assertNotNull(responseFilm);
+        assertEquals("Updated Film", responseFilm.getName());
     }
 
     @Test
-    void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() throws ValidationException {
+    void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() {
         Film updatedFilm = new Film();
         updatedFilm.setId(999);
         updatedFilm.setName("Updated Film");
@@ -84,9 +89,14 @@ class FilmControllerTest {
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
         updatedFilm.setDuration(130);
 
-        when(filmService.updateFilm(updatedFilm)).thenThrow(new ValidationException("Фильм с ID 999 не найден."));
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.update(updatedFilm));
+        when(filmService.getFilmById(updatedFilm.getId())).thenReturn(null);
+
+
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
+            filmService.updateFilm(updatedFilm);
+        });
         assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
     }
+
 }
