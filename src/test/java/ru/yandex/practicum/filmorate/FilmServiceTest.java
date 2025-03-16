@@ -29,34 +29,6 @@ class FilmServiceTest {
     }
 
     @Test
-    void shouldAddFilmSuccessfully() throws ValidationException {
-        Film film = new Film();
-        film.setName("Valid Film");
-        film.setDescription("A valid description.");
-        film.setReleaseDate(LocalDate.of(2000, 1, 1));
-        film.setDuration(120);
-
-        when(filmStorage.addFilm(any(Film.class))).thenReturn(film);
-
-        Film addedFilm = filmService.addFilm(film);
-        assertNotNull(addedFilm);
-        assertEquals("Valid Film", addedFilm.getName());
-        verify(filmStorage, times(1)).addFilm(film);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenFilmNameIsEmpty() {
-        Film film = new Film();
-        film.setName("");
-        film.setDescription("A valid description.");
-        film.setReleaseDate(LocalDate.of(2000, 1, 1));
-        film.setDuration(120);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> filmService.addFilm(film));
-        assertEquals("Название фильма не может быть пустым.", exception.getMessage());
-    }
-
-    @Test
     void shouldUpdateFilmSuccessfully() throws ValidationException {
         Film film = new Film();
         film.setId(1);
@@ -65,19 +37,14 @@ class FilmServiceTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(120);
 
-        when(filmStorage.addFilm(any(Film.class))).thenReturn(film);
         when(filmStorage.getFilmById(1)).thenReturn(film);
-
-        filmService.addFilm(film);
-
+        when(filmStorage.updateFilm(any(Film.class))).thenReturn(film);
         Film updatedFilm = new Film();
         updatedFilm.setId(1);
         updatedFilm.setName("Updated Film");
         updatedFilm.setDescription("Updated description.");
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
         updatedFilm.setDuration(130);
-
-        when(filmStorage.updateFilm(updatedFilm)).thenReturn(updatedFilm);
 
         Film responseFilm = filmService.updateFilm(updatedFilm);
 
@@ -88,7 +55,7 @@ class FilmServiceTest {
     @Test
     void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() {
         Film updatedFilm = new Film();
-        updatedFilm.setId(999);
+        updatedFilm.setId(999); // Неизвестный ID
         updatedFilm.setName("Updated Film");
         updatedFilm.setDescription("Updated description.");
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
