@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.exception.ResourceNotFoundException;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -12,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -34,13 +36,17 @@ public class FilmService {
     }
 
     public Film getFilmById(long id) {
-        return filmStorage.getFilmById(id);
+        Film film = filmStorage.getFilmById(id);
+        if (film == null) {
+            throw new ResourceNotFoundException("Фильм с ID " + id + " не найден.");
+        }
+        return film;
     }
 
     public Film updateFilm(Film updatedFilm) throws ValidationException {
         Film existingFilm = filmStorage.getFilmById(updatedFilm.getId());
         if (existingFilm == null) {
-            throw new ValidationException("Фильм с ID " + updatedFilm.getId() + " не найден.");
+            throw new ResourceNotFoundException("Фильм с ID " + updatedFilm.getId() + " не найден.");
         }
         validateFilm(updatedFilm);
 
@@ -52,7 +58,7 @@ public class FilmService {
     }
 
     public Collection<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+        return new ArrayList<>(filmStorage.getAllFilms());
     }
 
     public void addLike(long filmId, long userId) {

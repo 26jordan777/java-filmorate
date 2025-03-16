@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -35,13 +36,18 @@ public class FilmController {
         return ResponseEntity.ok(film);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Film> update(@PathVariable long id, @Valid @RequestBody Film updatedFilm) throws ValidationException {
-        log.info("Обновление фильма с ID: {}", id);
-        updatedFilm.setId(id);
-        Film film = filmService.updateFilm(updatedFilm);
-        return ResponseEntity.ok(film);
+    public ResponseEntity<Film> update(@Valid @RequestBody Film updatedFilm) throws ValidationException {
+        log.info("Обновление фильма с ID: {}", updatedFilm.getId());
+
+        Film existingFilm = filmService.getFilmById(updatedFilm.getId());
+        if (existingFilm == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм с ID " + updatedFilm.getId() + " не найден.");
+        }
+
+        filmService.updateFilm(updatedFilm);
+        return ResponseEntity.ok(updatedFilm);
     }
 
     @DeleteMapping("/{id}")

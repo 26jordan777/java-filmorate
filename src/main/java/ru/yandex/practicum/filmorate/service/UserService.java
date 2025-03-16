@@ -7,10 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.exception.ResourceNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -30,11 +32,11 @@ public class UserService {
         return addedUser;
     }
 
-    public User getUserById(long id) throws ValidationException {
+    public User getUserById(long id) {
         User user = userStorage.getUserById(id);
         if (user == null) {
             log.error("Пользователь с ID {} не найден.", id);
-            throw new ValidationException("Пользователь с ID " + id + " не найден.");
+            throw new ResourceNotFoundException("Пользователь с ID " + id + " не найден.");
         }
         return user;
     }
@@ -45,7 +47,7 @@ public class UserService {
         User existingUser = userStorage.getUserById(user.getId());
         if (existingUser == null) {
             log.error("Пользователь с ID {} не найден для обновления.", user.getId());
-            throw new ValidationException("Пользователь с ID " + user.getId() + " не найден.");
+            throw new ResourceNotFoundException("Пользователь с ID " + user.getId() + " не найден.");
         }
 
         User updatedUser = userStorage.updateUser(user);
@@ -59,8 +61,7 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        Collection<User> users = userStorage.getAllUsers();
-        return new ArrayList<>(users);
+        return new ArrayList<>(userStorage.getAllUsers());
     }
 
     public List<User> getFriends(Long userId) throws ValidationException {
@@ -116,6 +117,9 @@ public class UserService {
         }
         if (user.getBirthday() == null) {
             throw new ValidationException("Дата рождения не может быть пустой.");
+        }
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException("Дата рождения не может быть позже текущей даты.");
         }
     }
 
