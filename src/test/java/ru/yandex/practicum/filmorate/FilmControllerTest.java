@@ -64,7 +64,9 @@ class FilmControllerTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
             filmController.update(updatedFilm);
         });
-        assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("Фильм с ID 999 не найден.", exception.getReason());
     }
 
     @Test
