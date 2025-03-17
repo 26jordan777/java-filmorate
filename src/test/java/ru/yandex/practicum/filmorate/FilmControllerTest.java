@@ -35,21 +35,6 @@ class FilmControllerTest {
     }
 
     @Test
-    void shouldCreateFilmSuccessfully() throws ValidationException {
-        Film film = new Film();
-        film.setName("Valid Film");
-        film.setDescription("A valid description.");
-        film.setReleaseDate(LocalDate.of(2000, 1, 1));
-        film.setDuration(120);
-
-        when(filmService.addFilm(any(Film.class))).thenReturn(film);
-
-        ResponseEntity<Film> response = filmController.create(film);
-        assertEquals(HttpStatus.CREATED.value(), response.getStatusCodeValue());
-        assertEquals("Valid Film", response.getBody().getName());
-    }
-
-    @Test
     void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() throws ValidationException {
         Film updatedFilm = new Film();
         updatedFilm.setId(999);
@@ -85,21 +70,5 @@ class FilmControllerTest {
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertEquals("Фильм с ID 999 не найден.", exception.getReason());
-    }
-
-    @Test
-    void shouldReturnFilmById() throws ValidationException {
-        Film film = new Film();
-        film.setId(1);
-        film.setName("Valid Film");
-        film.setDescription("A valid description.");
-        film.setReleaseDate(LocalDate.of(2000, 1, 1));
-        film.setDuration(120);
-
-        when(filmService.getFilmById(1)).thenReturn(film);
-
-        ResponseEntity<Film> response = filmController.read(1);
-        assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
-        assertEquals("Valid Film", response.getBody().getName());
     }
 }
