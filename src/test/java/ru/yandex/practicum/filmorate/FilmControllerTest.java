@@ -100,7 +100,6 @@ class FilmControllerTest {
 
         ResponseEntity<Film> response = filmController.read(1);
         assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
-        assertNotNull(response.getBody());
         assertEquals("Valid Film", response.getBody().getName());
     }
 }
