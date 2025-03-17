@@ -46,7 +46,6 @@ class FilmControllerTest {
         when(filmService.addFilm(any(Film.class))).thenReturn(film);
 
         ResponseEntity<Film> response = filmController.create(film);
-
         assertEquals(HttpStatus.CREATED.value(), response.getStatusCodeValue());
         assertNotNull(response.getBody());
         assertEquals("Valid Film", response.getBody().getName());
@@ -66,6 +65,7 @@ class FilmControllerTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
             filmService.updateFilm(updatedFilm);
         });
+
         assertEquals("Фильм с ID 999 не найден.", exception.getReason());
     }
 
@@ -108,7 +108,6 @@ class FilmControllerTest {
         when(filmService.getFilmById(1)).thenReturn(film);
 
         ResponseEntity<Film> response = filmController.read(1);
-
         assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
         assertNotNull(response.getBody());
         assertEquals("Valid Film", response.getBody().getName());

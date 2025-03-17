@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -66,7 +65,7 @@ class FilmServiceTest {
 
         when(filmStorage.getFilmById(updatedFilm.getId())).thenReturn(null);
 
-       ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
             filmService.updateFilm(updatedFilm);
         });
 
