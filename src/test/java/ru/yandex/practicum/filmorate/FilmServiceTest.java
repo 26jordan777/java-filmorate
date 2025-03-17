@@ -48,7 +48,7 @@ class FilmServiceTest {
         updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
         updatedFilm.setDuration(130);
 
-        Film responseFilm = filmService.updateFilm(updatedFilm);
+        Film responseFilm = filmStorage.updateFilm(updatedFilm);
 
         assertNotNull(responseFilm);
         assertEquals("Updated Film", responseFilm.getName());
