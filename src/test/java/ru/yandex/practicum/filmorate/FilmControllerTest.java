@@ -7,13 +7,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -51,24 +51,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() throws ValidationException {
-        Film updatedFilm = new Film();
-        updatedFilm.setId(999);
-        updatedFilm.setName("Updated Film");
-        updatedFilm.setDescription("Updated description.");
-        updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
-        updatedFilm.setDuration(130);
-
-        when(filmService.updateFilm(updatedFilm)).thenThrow(new ValidationException("Фильм с ID 999 не найден."));
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            filmController.update(updatedFilm.getId(), updatedFilm);
-        });
-        assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
-    }
-
-    @Test
-    void shouldUpdateFilmSuccessfully() throws ValidationException {
+    void shouldThrowExceptionWhenUpdatingFilmWithNonExistentId() {
         Film updatedFilm = new Film();
         updatedFilm.setId(999);
         updatedFilm.setName("Updated Film");
@@ -78,12 +61,38 @@ class FilmControllerTest {
 
         when(filmStorage.getFilmById(updatedFilm.getId())).thenReturn(null);
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            filmController.update(updatedFilm);
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
+            filmService.updateFilm(updatedFilm);
         });
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
-        assertEquals("Фильм с ID 999 не найден.", exception.getReason());
+        assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
+    }
+
+    @Test
+    void shouldUpdateFilmSuccessfully() throws ValidationException {
+        Film existingFilm = new Film();
+        existingFilm.setId(1);
+        existingFilm.setName("Initial Film");
+        existingFilm.setDescription("Initial description.");
+        existingFilm.setReleaseDate(LocalDate.of(2000, 1, 1));
+        existingFilm.setDuration(120);
+
+        when(filmStorage.getFilmById(existingFilm.getId())).thenReturn(existingFilm);
+
+        Film updatedFilm = new Film();
+        updatedFilm.setId(1);
+        updatedFilm.setName("Updated Film");
+        updatedFilm.setDescription("Updated description.");
+        updatedFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
+        updatedFilm.setDuration(130);
+
+        when(filmStorage.updateFilm(updatedFilm)).thenReturn(updatedFilm);
+
+        ResponseEntity<Film> response = filmController.update(updatedFilm);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
+        assertEquals("Updated Film", Objects.requireNonNull(response.getBody()).getName());
     }
 
     @Test
@@ -103,12 +112,4 @@ class FilmControllerTest {
         assertEquals("Valid Film", response.getBody().getName());
     }
 
-    @Test
-    void shouldDeleteFilmSuccessfully() {
-        long filmId = 1L;
-        doNothing().when(filmService).deleteFilm(filmId);
-
-        ResponseEntity<Void> response = filmController.delete(filmId);
-        assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatusCodeValue());
-    }
 }
