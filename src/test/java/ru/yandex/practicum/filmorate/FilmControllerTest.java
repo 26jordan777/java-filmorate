@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -61,11 +62,10 @@ class FilmControllerTest {
 
         when(filmStorage.getFilmById(updatedFilm.getId())).thenReturn(null);
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
             filmService.updateFilm(updatedFilm);
         });
-
-        assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
+        assertEquals("Фильм с ID 999 не найден.", exception.getReason());
     }
 
     @Test
