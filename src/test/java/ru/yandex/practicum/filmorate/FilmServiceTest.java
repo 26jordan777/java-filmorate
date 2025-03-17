@@ -51,7 +51,7 @@ class FilmServiceTest {
         Film responseFilm = filmStorage.updateFilm(updatedFilm);
 
         assertNotNull(responseFilm);
-        assertEquals("Updated Film", responseFilm.getDescription());
+        assertEquals("Updated Film", responseFilm.getId());
     }
 
     @Test
