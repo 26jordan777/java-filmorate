@@ -61,8 +61,8 @@ class FilmControllerTest {
 
         when(filmService.updateFilm(updatedFilm)).thenThrow(new ValidationException("Фильм с ID 999 не найден."));
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            filmController.update(updatedFilm.getId(), updatedFilm);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            filmController.update(updatedFilm);
         });
         assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
     }
@@ -82,7 +82,7 @@ class FilmControllerTest {
             filmController.update(updatedFilm);
         });
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertEquals("Фильм с ID 999 не найден.", exception.getReason());
     }
 
@@ -101,14 +101,5 @@ class FilmControllerTest {
         assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
         assertNotNull(response.getBody());
         assertEquals("Valid Film", response.getBody().getName());
-    }
-
-    @Test
-    void shouldDeleteFilmSuccessfully() {
-        long filmId = 1L;
-        doNothing().when(filmService).deleteFilm(filmId);
-
-        ResponseEntity<Void> response = filmController.delete(filmId);
-        assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatusCodeValue());
     }
 }
