@@ -96,17 +96,18 @@ public class UserService {
     }
 
 
-    public ResponseEntity<Void> removeFriend(Long userId, Long friendId) {
+    public void removeFriend(Long userId, Long friendId) {
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
+
         if (user == null || friend == null) {
             throw new ResourceNotFoundException("Один из пользователей не найден.");
         }
+
         user.removeFriend(friendId);
-        friend.removeFriend(friendId);
+        friend.removeFriend(userId);
         userStorage.updateUser(user);
         userStorage.updateUser(friend);
-        return ResponseEntity.ok().build();
     }
 
     private void validateUser(User user) throws ValidationException {
