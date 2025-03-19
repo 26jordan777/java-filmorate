@@ -11,7 +11,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -59,10 +59,16 @@ public class FilmController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Collection<Film>> findAll() {
+    public ResponseEntity<List<Film>> findAll() {
         log.info("Получение списка всех фильмов");
-        Collection<Film> films = filmService.getAllFilms();
+        List<Film> films = (List<Film>) filmService.getAllFilms();
         return ResponseEntity.ok(films);
+    }
+
+    @GetMapping("/films/popular")
+    public ResponseEntity<List<Film>> getPopular(@RequestParam(defaultValue = "10") int count) {
+        List<Film> popularFilms = filmService.getTopFilms(count);
+        return ResponseEntity.ok(popularFilms);
     }
 
     @PutMapping("/{id}/like/{userId}")

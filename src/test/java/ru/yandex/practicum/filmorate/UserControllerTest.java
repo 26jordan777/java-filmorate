@@ -59,7 +59,7 @@ class UserControllerTest {
 
         when(userService.updateUser(updatedUser)).thenReturn(updatedUser);
 
-        ResponseEntity<User> response = userController.update(1, updatedUser);
+        ResponseEntity<User> response = userController.update(updatedUser);
         assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
         assertEquals("updated@example.com", response.getBody().getEmail());
     }
@@ -96,7 +96,7 @@ class UserControllerTest {
 
         when(userService.updateUser(updatedUser)).thenThrow(new ValidationException("Пользователь с ID 999 не найден."));
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.update(999, updatedUser));
+        ValidationException exception = assertThrows(ValidationException.class, () -> userController.update(updatedUser));
         assertEquals("Пользователь с ID 999 не найден.", exception.getMessage());
     }
 }

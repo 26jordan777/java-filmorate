@@ -67,7 +67,7 @@ public class UserService {
     public List<User> getFriends(Long userId) throws ValidationException {
         User user = userStorage.getUserById(userId);
         if (user == null) {
-            throw new ValidationException("Пользователь с ID " + userId + " не найден.");
+            throw new ResourceNotFoundException("Пользователь с ID " + userId + " не найден.");
         }
         List<User> friends = new ArrayList<>();
         for (Long friendId : user.getFriends()) {
@@ -83,7 +83,7 @@ public class UserService {
         User user = userStorage.getUserById(userId);
         User otherUser = userStorage.getUserById(otherId);
         if (user == null || otherUser == null) {
-            throw new ValidationException("Один из пользователей не найден.");
+            throw new ResourceNotFoundException("Один из пользователей не найден.");
         }
         Set<Long> commonFriendIds = new HashSet<>(user.getFriends());
         commonFriendIds.retainAll(otherUser.getFriends());
@@ -102,9 +102,10 @@ public class UserService {
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
         if (user == null || friend == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Один из пользователей не найден.");
+            throw new ResourceNotFoundException("Один из пользователей не найден.");
         }
         user.removeFriend(friendId);
+        friend.removeFriend(friendId);
         return ResponseEntity.ok().build();
     }
 
@@ -128,13 +129,14 @@ public class UserService {
         User friend = userStorage.getUserById(friendId);
 
         if (user == null) {
-            throw new ValidationException("Пользователь с ID " + userId + " не найден.");
+            throw new ResourceNotFoundException("Пользователь с ID " + userId + " не найден.");
         }
         if (friend == null) {
-            throw new ValidationException("Пользователь с ID " + friendId + " не найден.");
+            throw new ResourceNotFoundException("Пользователь с ID " + friendId + " не найден.");
         }
 
         user.addFriend(friendId);
+        friend.addFriend(userId);
         userStorage.updateUser(user);
     }
 }

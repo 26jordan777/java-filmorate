@@ -1,10 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+
 import ru.yandex.practicum.filmorate.exception.ResourceNotFoundException;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -14,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -46,7 +44,7 @@ public class FilmService {
     public Film updateFilm(Film updatedFilm) throws ValidationException {
         Film existingFilm = filmStorage.getFilmById(updatedFilm.getId());
         if (existingFilm == null) {
-            throw new ValidationException("Фильм с ID " + updatedFilm.getId() + " не найден.");
+            throw new ResourceNotFoundException("Фильм с ID " + updatedFilm.getId() + " не найден.");
         }
 
         validateFilm(updatedFilm);
@@ -58,18 +56,18 @@ public class FilmService {
         filmStorage.deleteFilm(id);
     }
 
-    public Collection<Film> getAllFilms() {
+    public List<Film> getAllFilms() {
         return new ArrayList<>(filmStorage.getAllFilms());
     }
 
     public void addLike(long filmId, long userId) {
         Film film = filmStorage.getFilmById(filmId);
         if (film == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм с ID " + filmId + " не найден.");
+            throw new ResourceNotFoundException("Фильм с ID " + filmId + " не найден.");
         }
         User user = userStorage.getUserById(userId);
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с ID " + userId + " не найден.");
+            throw new ResourceNotFoundException("Пользователь с ID " + userId + " не найден.");
         }
         film.addLike(userId);
     }
@@ -78,7 +76,7 @@ public class FilmService {
         Film film = filmStorage.getFilmById(filmId);
         User user = userStorage.getUserById(userId);
         if (film == null || user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм или пользователь не найден.");
+            throw new ResourceNotFoundException("Фильм или пользователь не найден.");
         }
         film.removeLike(userId);
         return ResponseEntity.ok().build();

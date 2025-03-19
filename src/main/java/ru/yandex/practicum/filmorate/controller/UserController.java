@@ -37,11 +37,10 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping()
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<User> update(@PathVariable long id, @Valid @RequestBody User updatedUser) throws ValidationException {
-        log.info("Обновление пользователя с ID: {}", id);
-        updatedUser.setId(id);
+    public ResponseEntity<User> update(@Valid @RequestBody User updatedUser) throws ValidationException {
+        log.info("Обновление пользователя с ID: {}", updatedUser.getId());
         User user = userService.updateUser(updatedUser);
         return ResponseEntity.ok(user);
     }
