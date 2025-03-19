@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -66,13 +67,15 @@ class UserControllerTest {
 
     @Test
     void shouldAddFriendSuccessfully() throws ValidationException {
-        Long userId = 2L;
-        Long friendId = 1L;
+        Long userId = 1L;
+        Long friendId = 2L;
 
         User user = new User();
         user.setId(userId);
+        user.setFriends(new HashSet<>());
         User friend = new User();
         friend.setId(friendId);
+        friend.setFriends(new HashSet<>());
 
         when(userService.getUserById(userId)).thenReturn(user);
         when(userService.getUserById(friendId)).thenReturn(friend);
@@ -83,6 +86,9 @@ class UserControllerTest {
 
         assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
         verify(userService, times(1)).addFriend(userId, friendId);
+
+        assertTrue(user.getFriends().contains(friendId), "Пользователь 1 должен быть другом пользователя 2");
+        assertTrue(friend.getFriends().contains(userId), "Пользователь 2 должен быть другом пользователя 1");
     }
 
     @SneakyThrows
