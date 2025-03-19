@@ -65,8 +65,9 @@ public class FilmController {
         return ResponseEntity.ok(films);
     }
 
-    @GetMapping("/films/popular")
+    @GetMapping("/popular")
     public ResponseEntity<List<Film>> getPopular(@RequestParam(defaultValue = "10") int count) {
+        System.out.println("Received count: " + count);
         List<Film> popularFilms = filmService.getTopFilms(count);
         return ResponseEntity.ok(popularFilms);
     }
