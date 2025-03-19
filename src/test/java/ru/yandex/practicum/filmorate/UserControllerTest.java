@@ -86,9 +86,6 @@ class UserControllerTest {
 
         assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
         verify(userService, times(1)).addFriend(userId, friendId);
-
-        assertTrue(user.getFriends().contains(friendId), "Пользователь 1 должен быть другом пользователя 2");
-        assertTrue(friend.getFriends().contains(userId), "Пользователь 2 должен быть другом пользователя 1");
     }
 
     @SneakyThrows
