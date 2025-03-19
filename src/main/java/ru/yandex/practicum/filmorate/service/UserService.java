@@ -104,6 +104,8 @@ public class UserService {
         }
         user.removeFriend(friendId);
         friend.removeFriend(friendId);
+        userStorage.updateUser(user);
+        userStorage.updateUser(friend);
         return ResponseEntity.ok().build();
     }
 
@@ -136,5 +138,6 @@ public class UserService {
         user.addFriend(friendId);
         friend.addFriend(userId);
         userStorage.updateUser(user);
+        userStorage.updateUser(friend);
     }
 }
