@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -70,5 +71,31 @@ class FilmServiceTest {
         });
 
         assertEquals("Фильм с ID 999 не найден.", exception.getMessage());
+    }
+
+    @Test
+    void shouldReturnPopularFilms() {
+        Film film1 = new Film();
+        film1.setId(1);
+        film1.setName("Film 1");
+        film1.setDescription("Description 1");
+        film1.setReleaseDate(LocalDate.of(2023, 1, 1));
+        film1.setDuration(120);
+        film1.addLike(1L);
+        Film film2 = new Film();
+        film2.setId(2);
+        film2.setName("Film 2");
+        film2.setDescription("Description 2");
+        film2.setReleaseDate(LocalDate.of(2023, 2, 1));
+        film2.setDuration(90);
+        film2.addLike(2L);
+
+        when(filmStorage.getAllFilms()).thenReturn(List.of(film1, film2));
+
+        List<Film> popularFilms = filmService.getTopFilms(2);
+
+        assertEquals(2, popularFilms.size());
+        assertEquals("Film 1", popularFilms.get(0).getName());
+        assertEquals("Film 2", popularFilms.get(1).getName());
     }
 }
