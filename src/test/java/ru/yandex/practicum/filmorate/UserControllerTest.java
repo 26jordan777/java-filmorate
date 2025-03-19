@@ -66,8 +66,8 @@ class UserControllerTest {
 
     @Test
     void shouldAddFriendSuccessfully() throws ValidationException {
-        Long userId = 1L;
-        Long friendId = 2L;
+        Long userId = 2L;
+        Long friendId = 1L;
 
         User user = new User();
         user.setId(userId);
