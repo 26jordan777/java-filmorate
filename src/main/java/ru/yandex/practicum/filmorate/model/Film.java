@@ -10,6 +10,7 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 
 @Data
 @Slf4j
@@ -29,6 +30,8 @@ public class Film {
     private long duration;
 
     private Set<Long> likes = new HashSet<>();
+    private List<String> genres;
+    private String mpaRating;
 
     public void addLike(long userId) {
         likes.add(userId);
