@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,12 +45,10 @@ public class UserDbStorageTest {
         user.setBirthday(LocalDate.of(2000, 1, 1));
 
         userDbStorage.addUser(user);
-        Optional<User> foundUser = userDbStorage.getUserById(user.getId());
+        User foundUser = userDbStorage.getUserById(user.getId());
 
-        assertThat(foundUser).isPresent()
-                .hasValueSatisfying(u ->
-                        assertThat(u).hasFieldOrPropertyWithValue("email", "existing@example.com")
-                );
+        assertThat(foundUser).isNotNull();
+        assertThat(foundUser.getEmail()).isEqualTo("existing@example.com");
     }
 
     @Test
@@ -67,10 +64,8 @@ public class UserDbStorageTest {
         user.setName("Updated Name");
         userDbStorage.updateUser(user);
 
-        Optional<User> updatedUser = userDbStorage.getUserById(user.getId());
-        assertThat(updatedUser).isPresent()
-                .hasValueSatisfying(u ->
-                        assertThat(u).hasFieldOrPropertyWithValue("name", "Updated Name")
-                );
+        User updatedUser = userDbStorage.getUserById(user.getId());
+        assertThat(updatedUser).isNotNull();
+        assertThat(updatedUser.getName()).isEqualTo("Updated Name");
     }
 }

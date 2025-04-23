@@ -24,8 +24,7 @@ public class FilmService {
     private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage,
-                       @Qualifier("UserDbStorage") UserStorage userStorage) {
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Qualifier("UserDbStorage") UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
