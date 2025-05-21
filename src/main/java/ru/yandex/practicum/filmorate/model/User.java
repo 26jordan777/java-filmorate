@@ -25,7 +25,8 @@ public class User {
     @NotNull(message = "Дата рождения не может быть пустой.")
     private LocalDate birthday;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String email, String login, String name, LocalDate birthday) {
         this.email = email;
