@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -21,8 +22,8 @@ public class FilmDbStorageTest {
     @Autowired
     private FilmDbStorage filmDbStorage;
 
-    @Test
-    public void testAddFilm() {
+    @BeforeEach
+    public void setUp() {
         Film film = new Film();
         film.setName("Test Film");
         film.setDescription("Test Description");
@@ -30,24 +31,27 @@ public class FilmDbStorageTest {
         film.setDuration(120);
 
         filmDbStorage.addFilm(film);
-
-        List<Film> films = filmDbStorage.getAllFilms();
-        assertThat(films).hasSize(1);
-        assertThat(films.get(0).getName()).isEqualTo("Test Film");
     }
 
     @Test
     public void testFindFilmById() {
+        Film foundFilm = filmDbStorage.getFilmById(1);
+        assertThat(foundFilm).isNotNull();
+        assertThat(foundFilm.getName()).isEqualTo("Test Film");
+    }
+
+    @Test
+    public void testAddFilm() {
         Film film = new Film();
-        film.setName("Existing Film");
-        film.setDescription("Existing Description");
-        film.setReleaseDate(LocalDate.of(2023, 1, 1));
-        film.setDuration(120);
+        film.setName("New Film");
+        film.setDescription("New Description");
+        film.setReleaseDate(LocalDate.of(2023, 2, 1));
+        film.setDuration(90);
 
         filmDbStorage.addFilm(film);
-        Film foundFilm = filmDbStorage.getFilmById(film.getId());
+        List<Film> films = filmDbStorage.getAllFilms();
 
-        assertThat(foundFilm).isNotNull();
-        assertThat(foundFilm.getName()).isEqualTo("Existing Film");
+        assertThat(films).hasSize(2);
+        assertThat(films.get(1).getName()).isEqualTo("New Film");
     }
 }

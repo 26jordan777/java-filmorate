@@ -30,6 +30,13 @@ public class GenreDbStorage implements GenreStorage {
         return jdbcTemplate.queryForObject(sql, this::mapRowToGenre, id);
     }
 
+    public Genre addGenre(Genre genre) {
+        String sql = "INSERT INTO GENRES (name) VALUES (?) RETURNING id";
+        Long id = jdbcTemplate.queryForObject(sql, Long.class, genre.getName());
+        genre.setId(id);
+        return genre;
+    }
+
     private Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException {
         Genre genre = new Genre();
         genre.setId(rs.getLong("id"));

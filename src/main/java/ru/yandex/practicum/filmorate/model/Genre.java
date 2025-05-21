@@ -6,4 +6,11 @@ import lombok.Data;
 public class Genre {
     private long id;
     private String name;
+
+    public Genre() {
+    }
+
+    public Genre(String name) {
+        this.name = name;
+    }
 }

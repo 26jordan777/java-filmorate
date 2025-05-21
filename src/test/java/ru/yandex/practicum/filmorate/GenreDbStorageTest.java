@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,6 +21,24 @@ public class GenreDbStorageTest {
 
     @Autowired
     private GenreDbStorage genreDbStorage;
+
+    @BeforeEach
+    public void setUp() {
+        genreDbStorage.addGenre(new Genre("Комедия"));
+        genreDbStorage.addGenre(new Genre("Драма"));
+    }
+
+    @Test
+    public void testAddGenre() {
+        Genre genre = new Genre();
+        genre.setName("Комедия");
+
+        Genre addedGenre = genreDbStorage.addGenre(genre);
+
+        assertThat(addedGenre).isNotNull();
+        assertThat(addedGenre.getId()).isNotNull();
+        assertThat(addedGenre.getName()).isEqualTo("Комедия");
+    }
 
     @Test
     public void testGetAllGenres() {
