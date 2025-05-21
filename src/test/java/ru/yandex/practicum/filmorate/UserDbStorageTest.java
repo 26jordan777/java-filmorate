@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -21,8 +22,12 @@ public class UserDbStorageTest {
     @Autowired
     private UserDbStorage userDbStorage;
 
-    @Test
-    public void testAddUser() {
+    @BeforeEach
+    public void setUp() {
+        List<User> users = userDbStorage.getAllUsers();
+        for (User user : users) {
+            userDbStorage.deleteUser(user.getId());
+        }
         User user = new User();
         user.setEmail("user@example.com");
         user.setLogin("validLogin");
@@ -30,42 +35,51 @@ public class UserDbStorageTest {
         user.setBirthday(LocalDate.of(2000, 1, 1));
 
         userDbStorage.addUser(user);
+    }
+
+    @Test
+    public void testAddUser() {
+        User user = new User();
+        user.setEmail("newuser@example.com");
+        user.setLogin("newLogin");
+        user.setName("New User");
+        user.setBirthday(LocalDate.of(1990, 1, 1));
+
+        userDbStorage.addUser(user);
 
         List<User> users = userDbStorage.getAllUsers();
-        assertThat(users).hasSize(1);
-        assertThat(users.get(0).getEmail()).isEqualTo("user@example.com");
+        assertThat(users).hasSize(2);
+        assertThat(users.get(1).getEmail()).isEqualTo("newuser@example.com");
     }
 
     @Test
     public void testFindUserById() {
-        User user = new User();
-        user.setEmail("existing@example.com");
-        user.setLogin("existingLogin");
-        user.setName("Existing Name");
-        user.setBirthday(LocalDate.of(2000, 1, 1));
-
-        userDbStorage.addUser(user);
-        User foundUser = userDbStorage.getUserById(user.getId());
-
+        User foundUser = userDbStorage.getUserById(1);
         assertThat(foundUser).isNotNull();
-        assertThat(foundUser.getEmail()).isEqualTo("existing@example.com");
+        assertThat(foundUser.getEmail()).isEqualTo("user@example.com");
     }
 
     @Test
     public void testUpdateUser() {
-        User user = new User();
-        user.setEmail("update@example.com");
-        user.setLogin("updateLogin");
-        user.setName("Update Name");
-        user.setBirthday(LocalDate.of(2000, 1, 1));
-
-        userDbStorage.addUser(user);
-
+        User user = userDbStorage.getUserById(1);
         user.setName("Updated Name");
         userDbStorage.updateUser(user);
 
-        User updatedUser = userDbStorage.getUserById(user.getId());
+        User updatedUser = userDbStorage.getUserById(1);
         assertThat(updatedUser).isNotNull();
         assertThat(updatedUser.getName()).isEqualTo("Updated Name");
+    }
+
+
+    @Test
+    public void testDeleteUser() {
+        User user = new User();
+        user.setEmail("user@example.com");
+        user.setLogin("validLogin");
+        user.setName("Valid Name");
+        user.setBirthday(LocalDate.of(2000, 1, 1));
+
+        userDbStorage.deleteUser(user.getId());
+
     }
 }

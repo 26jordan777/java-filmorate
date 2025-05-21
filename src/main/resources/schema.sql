@@ -1,44 +1,42 @@
-  create table if not exists USERS (
-      id integer not null primary key auto_increment,
-      email varchar(255) not null,
-      login varchar(255) not null,
-      name varchar(255) not null,
-      birthday date not null
-  );
+ create TABLE IF NOT EXISTS USERS (
+    id BIGSERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    login VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    birthday DATE NOT NULL
+);
 
-  create table if not exists FILM_GENRES (
+create TABLE IF NOT EXISTS FILMS (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(200),
+    release_date DATE NOT NULL,
+    duration BIGINT NOT NULL
+);
+
+create TABLE IF NOT EXISTS GENRES (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+create TABLE IF NOT EXISTS MPA (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+create TABLE IF NOT EXISTS FILM_GENRES (
     film_id BIGINT NOT NULL,
     genre_id BIGINT NOT NULL,
     PRIMARY KEY (film_id, genre_id),
-    FOREIGN KEY (film_id) REFERENCES FILMS(id),
-    FOREIGN KEY (genre_id) REFERENCES GENRES(id)
+    FOREIGN KEY (film_id) REFERENCES FILMS(id) ON delete CASCADE,
+    FOREIGN KEY (genre_id) REFERENCES GENRES(id) ON delete CASCADE
 );
 
-
-  create table if not exists FRIENDSHIP (
+create TABLE IF NOT EXISTS FRIENDSHIP (
     user_id BIGINT NOT NULL,
     friend_id BIGINT NOT NULL,
     status BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (user_id, friend_id),
-    FOREIGN KEY (user_id) REFERENCES USERS(id),
-    FOREIGN KEY (friend_id) REFERENCES USERS(id)
+    FOREIGN KEY (user_id) REFERENCES USERS(id) ON delete CASCADE,
+    FOREIGN KEY (friend_id) REFERENCES USERS(id) ON delete CASCADE
 );
-
-
-  create table if not exists FILMS (
-      film_id integer primary key auto_increment,
-      name VARCHAR(255) not null,
-      description VARCHAR(200),
-      release_date DATE not null,
-      duration BIGINT not null
-  );
-
-  create table if not exists GENRES (
-      genres_id integer primary key auto_increment,
-      name VARCHAR(255) not null
-  );
-
-  create table if not exists MPA (
-      mpa_id integer primary key auto_increment,
-      name VARCHAR(255) not null
-  );
