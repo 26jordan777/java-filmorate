@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -16,6 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase
 @Import(MpaDbStorage.class)
 public class MpaDbStorageTest {
+
+    @BeforeEach
+    public void setUp() {
+        mpaDbStorage.addMpa(new Mpa("G"));
+        mpaDbStorage.addMpa(new Mpa("PG"));
+    }
 
     @Autowired
     private MpaDbStorage mpaDbStorage;
