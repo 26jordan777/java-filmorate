@@ -25,7 +25,7 @@ public class GenreDbStorageTest {
     @BeforeEach
     public void setUp() {
         genreDbStorage.addGenre(new Genre("Комедия"));
-        genreDbStorage.addGenre(new Genre("Драма"));
+
     }
 
     @Test
