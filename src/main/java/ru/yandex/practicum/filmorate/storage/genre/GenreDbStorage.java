@@ -33,8 +33,11 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     public Genre addGenre(Genre genre) {
-        String sql = "INSERT INTO GENRES (name) VALUES (?) RETURNING id";
-        Long id = jdbcTemplate.queryForObject(sql, Long.class, genre.getName());
+        String sql = "INSERT INTO genres (name) VALUES (?)";
+        jdbcTemplate.update(sql, genre.getName());
+
+        String idSql = "SELECT LAST_INSERT_ID()";
+        Long id = jdbcTemplate.queryForObject(idSql, Long.class);
         genre.setId(id);
         return genre;
     }
