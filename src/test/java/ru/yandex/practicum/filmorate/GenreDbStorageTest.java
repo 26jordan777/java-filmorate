@@ -48,7 +48,7 @@ public class GenreDbStorageTest {
 
     @Test
     public void testGetGenreById() {
-        Genre genre = genreDbStorage.getGenreById(1);
+        Genre genre = genreDbStorage.getGenreById(1).orElse(null); 
         assertThat(genre).isNotNull();
         assertThat(genre.getId()).isEqualTo(1);
     }
