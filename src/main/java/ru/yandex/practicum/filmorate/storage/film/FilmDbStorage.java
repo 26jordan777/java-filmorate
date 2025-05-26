@@ -30,6 +30,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setId(id);
         return film;
     }
+
     @Override
     public Film updateFilm(Film film) {
         String sql = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ? WHERE id = ?";

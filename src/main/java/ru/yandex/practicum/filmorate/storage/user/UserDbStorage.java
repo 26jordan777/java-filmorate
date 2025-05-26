@@ -30,6 +30,7 @@ public class UserDbStorage implements UserStorage {
         user.setId(id);
         return user;
     }
+
     @Override
     public User getUserById(long id) {
         String sql = "SELECT * FROM USERS WHERE id = ?";
