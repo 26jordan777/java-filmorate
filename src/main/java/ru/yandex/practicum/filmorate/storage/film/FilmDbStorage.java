@@ -25,7 +25,7 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "INSERT INTO FILMS (name, description, release_date, duration) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration());
 
-        String idSql = "SELECT LAST_INSERT_ID()";
+        String idSql = "SELECT IDENTITY()";
         Long id = jdbcTemplate.queryForObject(idSql, Long.class);
         film.setId(id);
         return film;

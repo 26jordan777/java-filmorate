@@ -22,14 +22,23 @@ public class MpaDbStorageTest {
 
     @Test
     public void testGetAllMpa() {
-        List<Mpa> mpas = mpaDbStorage.getAllMpa();
-        assertThat(mpas).isNotEmpty();
+
+        Mpa mpa1 = new Mpa("G");
+        Mpa mpa2 = new Mpa("PG");
+        mpaDbStorage.addMpa(mpa1);
+        mpaDbStorage.addMpa(mpa2);
+
+        List<Mpa> mpaList = mpaDbStorage.getAllMpa();
+        assertThat(mpaList).isNotEmpty();
     }
 
     @Test
     public void testGetMpaById() {
-        Mpa mpa = mpaDbStorage.getMpaById(1);
-        assertThat(mpa).isNotNull();
-        assertThat(mpa.getId()).isEqualTo(1);
+        Mpa mpa = new Mpa("PG");
+        Mpa addedMpa = mpaDbStorage.addMpa(mpa);
+
+        Mpa foundMpa = mpaDbStorage.getMpaById(addedMpa.getId());
+        assertThat(foundMpa).isNotNull();
+        assertThat(foundMpa.getId()).isEqualTo(addedMpa.getId());
     }
 }

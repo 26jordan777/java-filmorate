@@ -8,4 +8,6 @@ public interface MpaStorage {
     List<Mpa> getAllMpa();
 
     Mpa getMpaById(long id);
+
+    Mpa addMpa(Mpa mpa);
 }

@@ -18,6 +18,7 @@ public class MpaDbStorage implements MpaStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+
     @Override
     public List<Mpa> getAllMpa() {
         String sql = "SELECT * FROM mpa";
@@ -34,6 +35,17 @@ public class MpaDbStorage implements MpaStorage {
         Mpa mpa = new Mpa();
         mpa.setId(rs.getLong("id"));
         mpa.setName(rs.getString("name"));
+        return mpa;
+    }
+
+    @Override
+    public Mpa addMpa(Mpa mpa) {
+        String sql = "INSERT INTO MPA (name) VALUES (?)";
+        jdbcTemplate.update(sql, mpa.getName());
+
+
+        Long id = jdbcTemplate.queryForObject("SELECT IDENTITY()", Long.class);
+        mpa.setId(id);
         return mpa;
     }
 }
