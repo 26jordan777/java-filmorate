@@ -29,7 +29,10 @@ public class UserDbStorageTest {
 
     @Test
     public void testFindUserById() {
-        User foundUser = userDbStorage.getUserById(1);
+        User userToAdd = new User("user@example.com", "validLogin", "Valid Name", LocalDate.of(2000, 1, 1));
+        User addedUser = userDbStorage.addUser(userToAdd);
+
+        User foundUser = userDbStorage.getUserById(addedUser.getId());
         assertThat(foundUser).isNotNull();
         assertThat(foundUser.getEmail()).isEqualTo("user@example.com");
     }

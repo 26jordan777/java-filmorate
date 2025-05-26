@@ -24,6 +24,10 @@ public class FilmDbStorage implements FilmStorage {
     public Film addFilm(Film film) {
         String sql = "INSERT INTO films (name, description, release_date, duration) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration());
+
+        String idSql = "SELECT LAST_INSERT_ID()"; // Для H2
+        Long id = jdbcTemplate.queryForObject(idSql, Long.class);
+        film.setId(id);
         return film;
     }
 
