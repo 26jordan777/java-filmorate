@@ -28,7 +28,8 @@ public class FilmDbStorageTest {
         film.setReleaseDate(LocalDate.of(2023, 1, 1));
         film.setDuration(120);
 
-        Film addedFilm = filmDbStorage.addFilm(film); 
+
+        Film addedFilm = filmDbStorage.addFilm(film);
         assertThat(addedFilm).isNotNull();
         assertThat(addedFilm.getId()).isGreaterThan(0);
         assertThat(addedFilm.getName()).isEqualTo("Test Film");
