@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class GenreDbStorage implements GenreStorage {
@@ -25,9 +26,9 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
-    public Genre getGenreById(long id) {
+    public Optional<Genre> getGenreById(long id) {
         String sql = "SELECT * FROM genres WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, this::mapRowToGenre, id);
+        return jdbcTemplate.query(sql, this::mapRowToGenre, id).stream().findFirst();
     }
 
     public Genre addGenre(Genre genre) {

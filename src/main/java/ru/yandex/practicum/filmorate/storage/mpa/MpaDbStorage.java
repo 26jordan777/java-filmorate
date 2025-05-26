@@ -37,10 +37,13 @@ public class MpaDbStorage implements MpaStorage {
         return mpa;
     }
 
-    public Mpa addMpa(Mpa mpa) {
-        String sql = "INSERT INTO MPA (name) VALUES (?) RETURNING id";
-        Long id = jdbcTemplate.queryForObject(sql, Long.class, mpa.getName());
+    public void addMpa(Mpa mpa) {
+        String sql = "INSERT INTO MPA (name) VALUES (?)";
+        jdbcTemplate.update(sql, mpa.getName());
+
+        String idSql = "SELECT LAST_INSERT_ID()";
+        Long id = jdbcTemplate.queryForObject(idSql, Long.class);
+
         mpa.setId(id);
-        return mpa;
     }
 }
