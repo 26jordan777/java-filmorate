@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
+@Qualifier("UserDbStorage")
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
@@ -22,9 +24,12 @@ public class UserDbStorage implements UserStorage {
     public User addUser(User user) {
         String sql = "INSERT INTO USERS (email, login, name, birthday) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
+
+        String idSql = "SELECT LAST_INSERT_ID()";
+        Long id = jdbcTemplate.queryForObject(idSql, Long.class);
+        user.setId(id);
         return user;
     }
-
     @Override
     public User getUserById(long id) {
         String sql = "SELECT * FROM USERS WHERE id = ?";

@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,11 +28,10 @@ public class FilmDbStorageTest {
         film.setReleaseDate(LocalDate.of(2023, 1, 1));
         film.setDuration(120);
 
-        filmDbStorage.addFilm(film);
-
-        List<Film> films = filmDbStorage.getAllFilms();
-        assertThat(films).hasSize(1);
-        assertThat(films.get(0).getName()).isEqualTo("Test Film");
+        Film addedFilm = filmDbStorage.addFilm(film); 
+        assertThat(addedFilm).isNotNull();
+        assertThat(addedFilm.getId()).isGreaterThan(0);
+        assertThat(addedFilm.getName()).isEqualTo("Test Film");
     }
 
     @Test
@@ -44,10 +42,24 @@ public class FilmDbStorageTest {
         film.setReleaseDate(LocalDate.of(2023, 1, 1));
         film.setDuration(120);
 
-        filmDbStorage.addFilm(film);
-        Film foundFilm = filmDbStorage.getFilmById(film.getId());
-
+        Film addedFilm = filmDbStorage.addFilm(film);
+        Film foundFilm = filmDbStorage.getFilmById(addedFilm.getId());
         assertThat(foundFilm).isNotNull();
         assertThat(foundFilm.getName()).isEqualTo("Existing Film");
+    }
+
+    @Test
+    public void testDeleteFilm() {
+        Film film = new Film();
+        film.setName("Film to Delete");
+        film.setDescription("Description");
+        film.setReleaseDate(LocalDate.of(2023, 1, 1));
+        film.setDuration(120);
+
+        Film addedFilm = filmDbStorage.addFilm(film);
+        filmDbStorage.deleteFilm(addedFilm.getId());
+
+        Film deletedFilm = filmDbStorage.getFilmById(addedFilm.getId());
+        assertThat(deletedFilm).isNull();
     }
 }
