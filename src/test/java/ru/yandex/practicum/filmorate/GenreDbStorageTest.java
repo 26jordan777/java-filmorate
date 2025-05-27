@@ -22,14 +22,19 @@ public class GenreDbStorageTest {
 
     @Test
     public void testGetAllGenres() {
+        Genre genre = new Genre("Комедия");
+        genreDbStorage.addGenre(genre);
         List<Genre> genres = genreDbStorage.getAllGenres();
         assertThat(genres).isNotEmpty();
     }
 
     @Test
     public void testGetGenreById() {
-        Genre genre = genreDbStorage.getGenreById(1);
-        assertThat(genre).isNotNull();
-        assertThat(genre.getId()).isEqualTo(1);
+        Genre genre = new Genre("Драма");
+        Genre addedGenre = genreDbStorage.addGenre(genre);
+
+        Genre foundGenre = genreDbStorage.getGenreById(addedGenre.getId());
+        assertThat(foundGenre).isNotNull();
+        assertThat(foundGenre.getId()).isEqualTo(addedGenre.getId());
     }
 }

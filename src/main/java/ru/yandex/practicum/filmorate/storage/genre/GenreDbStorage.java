@@ -36,4 +36,12 @@ public class GenreDbStorage implements GenreStorage {
         genre.setName(rs.getString("name"));
         return genre;
     }
+
+    @Override
+    public Genre addGenre(Genre genre) {
+        String sql = "INSERT INTO genres (name) VALUES (?)";
+        int id = jdbcTemplate.update(sql, genre.getName());
+        genre.setId(id);
+        return genre;
+    }
 }

@@ -23,10 +23,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film addFilm(Film film) {
         String sql = "INSERT INTO FILMS (name, description, release_date, duration) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration());
-
-        String idSql = "SELECT IDENTITY()";
-        Long id = jdbcTemplate.queryForObject(idSql, Long.class);
+        int id = jdbcTemplate.update(sql, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration());
         film.setId(id);
         return film;
     }
