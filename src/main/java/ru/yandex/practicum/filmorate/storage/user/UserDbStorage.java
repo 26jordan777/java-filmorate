@@ -23,10 +23,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User addUser(User user) {
         String sql = "INSERT INTO USERS (email, login, name, birthday) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
-
-        String idSql = "SELECT IDENTITY()";
-        Long id = jdbcTemplate.queryForObject(idSql, Long.class);
+        int id = jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
         user.setId(id);
         return user;
     }

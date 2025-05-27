@@ -21,15 +21,11 @@ public class MpaDbStorageTest {
     private MpaDbStorage mpaDbStorage;
 
     @Test
-    public void testGetAllMpa() {
-
-        Mpa mpa1 = new Mpa("G");
-        Mpa mpa2 = new Mpa("PG");
-        mpaDbStorage.addMpa(mpa1);
-        mpaDbStorage.addMpa(mpa2);
-
-        List<Mpa> mpaList = mpaDbStorage.getAllMpa();
-        assertThat(mpaList).isNotEmpty();
+    public void testAddMpa() {
+        Mpa mpa = new Mpa("PG");
+        Mpa addedMpa = mpaDbStorage.addMpa(mpa);
+        assertThat(addedMpa).isNotNull();
+        assertThat(addedMpa.getId()).isGreaterThan(0);
     }
 
     @Test
@@ -40,5 +36,17 @@ public class MpaDbStorageTest {
         Mpa foundMpa = mpaDbStorage.getMpaById(addedMpa.getId());
         assertThat(foundMpa).isNotNull();
         assertThat(foundMpa.getId()).isEqualTo(addedMpa.getId());
+    }
+
+    @Test
+    public void testGetAllMpa() {
+
+        Mpa mpa1 = new Mpa("G");
+        Mpa mpa2 = new Mpa("PG");
+        mpaDbStorage.addMpa(mpa1);
+        mpaDbStorage.addMpa(mpa2);
+
+        List<Mpa> mpaList = mpaDbStorage.getAllMpa();
+        assertThat(mpaList).isNotEmpty();
     }
 }

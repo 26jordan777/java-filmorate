@@ -38,15 +38,16 @@ public class FilmDbStorageTest {
     @Test
     public void testFindFilmById() {
         Film film = new Film();
-        film.setName("Existing Film");
-        film.setDescription("Existing Description");
+        film.setName("Test Film");
+        film.setDescription("Test Description");
         film.setReleaseDate(LocalDate.of(2023, 1, 1));
         film.setDuration(120);
 
         Film addedFilm = filmDbStorage.addFilm(film);
         Film foundFilm = filmDbStorage.getFilmById(addedFilm.getId());
         assertThat(foundFilm).isNotNull();
-        assertThat(foundFilm.getName()).isEqualTo("Existing Film");
+        assertThat(foundFilm.getName()).isEqualTo("Test Film");
+
     }
 
     @Test

@@ -41,10 +41,7 @@ public class MpaDbStorage implements MpaStorage {
     @Override
     public Mpa addMpa(Mpa mpa) {
         String sql = "INSERT INTO MPA (name) VALUES (?)";
-        jdbcTemplate.update(sql, mpa.getName());
-
-
-        Long id = jdbcTemplate.queryForObject("SELECT IDENTITY()", Long.class);
+        int id = jdbcTemplate.update(sql, mpa.getName());
         mpa.setId(id);
         return mpa;
     }

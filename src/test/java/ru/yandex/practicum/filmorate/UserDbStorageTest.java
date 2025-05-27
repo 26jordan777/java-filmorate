@@ -20,6 +20,10 @@ public class UserDbStorageTest {
     @Autowired
     private UserDbStorage userDbStorage;
 
+    public UserDbStorageTest(UserDbStorage userDbStorage) {
+        this.userDbStorage = userDbStorage;
+    }
+
     @Test
     public void testAddUser() {
         User user = new User("user" + System.currentTimeMillis() + "@example.com", "validLogin", "Valid Name", LocalDate.of(2000, 1, 1));
