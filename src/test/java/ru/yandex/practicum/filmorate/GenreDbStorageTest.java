@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+//package ru.yandex.practicum.filmorate;
 
 //import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +12,13 @@ import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
 
 //import static org.assertj.core.api.Assertions.assertThat;
 
-@JdbcTest
-@AutoConfigureTestDatabase
-@Import(GenreDbStorage.class)
-public class GenreDbStorageTest {
+//@JdbcTest
+//@AutoConfigureTestDatabase
+//@Import(GenreDbStorage.class)
+//public class GenreDbStorageTest {
 
-    @Autowired
-    private GenreDbStorage genreDbStorage;
+    //@Autowired
+   // private GenreDbStorage genreDbStorage;
 
    // @Test
    // public void testGetAllGenres() {
@@ -37,4 +37,4 @@ public class GenreDbStorageTest {
       //  assertThat(foundGenre).isNotNull();
        // assertThat(foundGenre.getId()).isEqualTo(addedGenre.getId());
    // }
-}
+//}
