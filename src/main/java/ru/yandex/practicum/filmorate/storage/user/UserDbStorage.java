@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,11 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getUserById(long id) {
         String sql = "SELECT * FROM USERS WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, this::mapRowToUser, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, this::mapRowToUser, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     @Override

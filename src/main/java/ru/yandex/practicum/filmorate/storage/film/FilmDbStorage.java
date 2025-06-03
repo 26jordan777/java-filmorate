@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,7 +40,11 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film getFilmById(long id) {
         String sql = "SELECT * FROM films WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, this::mapRowToFilm, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, this::mapRowToFilm, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     @Override
