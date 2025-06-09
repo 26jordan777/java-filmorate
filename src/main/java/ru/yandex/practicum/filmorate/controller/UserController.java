@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ResourceNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -37,19 +38,26 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PutMapping()
+    @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<User> update(@Valid @RequestBody User updatedUser) throws ValidationException {
         log.info("Обновление пользователя с ID: {}", updatedUser.getId());
-        User user = userService.updateUser(updatedUser);
-        return ResponseEntity.ok(user);
+
+        User existingUser = userService.getUserById(updatedUser.getId());
+        if (existingUser == null) {
+            throw new ValidationException("Пользователь с ID " + updatedUser.getId() + " не найден.");
+        }
+
+        User updatedUserResponse = userService.updateUser(updatedUser);
+        return ResponseEntity.ok(updatedUserResponse);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable long id) {
+    public ResponseEntity<Void> delete(@PathVariable long id) {
         log.info("Удаление пользователя с ID: {}", id);
         userService.deleteUser(id);
+        return null;
     }
 
     @GetMapping
@@ -76,12 +84,14 @@ public class UserController {
         return ResponseEntity.ok(commonFriends);
     }
 
-    @PutMapping("/{id}/friends/{friendId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Void> addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
-        log.info("Вызван метод PUT /users/{id}/friends/{friendId} с id = {} и friendId = {}", userId, friendId);
-        userService.addFriend(userId, friendId);
-        return ResponseEntity.ok().build();
+    @PutMapping("/{userId}/friends/{friendId}")
+    public ResponseEntity<Void> addFriend(@PathVariable Long userId, @PathVariable Long friendId) {
+        try {
+            userService.addFriend(userId, friendId);
+            return ResponseEntity.ok().build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
