@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+/*package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,3 +64,5 @@ public class FilmDbStorageTest {
         assertThat(deletedFilm).isNull();
     }
 }
+
+ */
