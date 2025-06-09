@@ -45,7 +45,7 @@ public class UserController {
 
         User existingUser = userService.getUserById(updatedUser.getId());
         if (existingUser == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            throw new ValidationException("Пользователь с ID " + updatedUser.getId() + " не найден.");
         }
 
         User updatedUserResponse = userService.updateUser(updatedUser);
