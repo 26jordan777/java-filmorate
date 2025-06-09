@@ -79,4 +79,6 @@ public class UserDbStorage implements UserStorage {
                 "WHERE f.user_id = ?";
         return jdbcTemplate.query(sql, this::mapRowToUser, userId);
     }
+
+
 }

@@ -76,11 +76,14 @@ class UserControllerTest {
 
     @Test
     public void testDeleteUser() {
-        user.setId(1);
-        doNothing().when(userService).deleteUser(1);
+        User user = new User("user@example.com", "validLogin", "Valid Name", LocalDate.of(2000, 1, 1));
+        User addedUser = userDbStorage.addUser(user);
 
-        ResponseEntity<Void> response = userController.delete(1);
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        userDbStorage.deleteUser(addedUser.getId());
+
+
+        User deletedUser = userDbStorage.getUserById(addedUser.getId());
+        assertThat(deletedUser).isNull();
     }
 }
