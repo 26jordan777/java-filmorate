@@ -32,6 +32,19 @@ public class UserDbStorageTest {
         assertThat(addedUser.getEmail()).isEqualTo(user.getEmail());
     }
 
+@Test
+public void testUpdateUser() {
+    User user = new User("user@example.com", "validLogin", "Valid Name", LocalDate.of(2000, 1, 1));
+    User addedUser = userDbStorage.addUser(user); // Добавляем пользователя
+
+    // Обновляем данные пользователя
+    addedUser.setName("Updated Name");
+    User updatedUser = userDbStorage.updateUser(addedUser); // Обновляем пользователя
+
+    assertThat(updatedUser).isNotNull();
+    assertThat(updatedUser.getName()).isEqualTo("Updated Name");
+}
+
     @Test
     public void testFindUserById() {
         User user = new User("user" + System.currentTimeMillis() + "@example.com", "validLogin", "Valid Name", LocalDate.of(2000, 1, 1));
@@ -51,6 +64,18 @@ public class UserDbStorageTest {
         User deletedUser = userDbStorage.getUserById(addedUser.getId());
         assertThat(deletedUser).isNull();
     }
+
+   @Test
+public void testAddFriend() {
+    User user1 = userDbStorage.addUser(new User("user1@example.com", "login1", "User 1", LocalDate.of(2000, 1, 1)));
+    User user2 = userDbStorage.addUser(new User("user2@example.com", "login2", "User 2", LocalDate.of(2000, 1, 1)));
+
+    userService.addFriend(user1.getId(), user2.getId());
+
+    List<User> friends = userService.getFriends(user1.getId());
+    assertThat(friends).hasSize(1);
+    assertThat(friends.get(0).getId()).isEqualTo(user2.getId());
+}
 }
 
  */

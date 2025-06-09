@@ -102,4 +102,6 @@ class UserControllerTest {
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.update(updatedUser));
         assertEquals("Пользователь с ID 999 не найден.", exception.getMessage());
     }
+
+
 }

@@ -29,6 +29,11 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    public void addFriend(Long userId, Long friendId) {
+        String sql = "INSERT INTO FRIENDSHIP (user_id, friend_id) VALUES (?, ?)";
+        jdbcTemplate.update(sql, userId, friendId);
+    }
+
     @Override
     public User getUserById(long id) {
         String sql = "SELECT * FROM USERS WHERE id = ?";
@@ -66,5 +71,12 @@ public class UserDbStorage implements UserStorage {
         user.setName(rs.getString("name"));
         user.setBirthday(rs.getDate("birthday").toLocalDate());
         return user;
+    }
+
+    public List<User> getFriends(Long userId) {
+        String sql = "SELECT f.friend_id, u.email, u.login, u.name, u.birthday " +
+                "FROM FRIENDSHIP f JOIN USERS u ON f.friend_id = u.id " +
+                "WHERE f.user_id = ?";
+        return jdbcTemplate.query(sql, this::mapRowToUser, userId);
     }
 }
