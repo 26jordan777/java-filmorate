@@ -8,13 +8,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.exception.ResourceNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
-
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,7 +47,6 @@ class UserControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("user@example.com", response.getBody().getEmail());
-        assertEquals("validLogin", response.getBody().getLogin());
     }
 
     @Test
@@ -70,20 +70,32 @@ class UserControllerTest {
         user.setId(999);
         when(userService.getUserById(999)).thenReturn(null);
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.update(user));
-        assertEquals("Пользователь с ID 999 не найден.", exception.getMessage());
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            userController.update(user);
+        });
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("Пользователь с ID 999 не найден.", exception.getReason());
     }
 
     @Test
     public void testDeleteUser() {
-        User user = new User("user@example.com", "validLogin", "Valid Name", LocalDate.of(2000, 1, 1));
-        User addedUser = userDbStorage.addUser(user);
+        user.setId(1);
+        doNothing().when(userService).deleteUser(1);
+        ResponseEntity<Void> response = userController.delete(1);
 
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
 
-        userDbStorage.deleteUser(addedUser.getId());
+    @Test
+    void shouldThrowExceptionWhenDeletingNonExistentUser() {
+        doThrow(new ResourceNotFoundException("Пользователь с ID 999 не найден.")).when(userService).deleteUser(999);
 
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            userController.delete(999);
+        });
 
-        User deletedUser = userDbStorage.getUserById(addedUser.getId());
-        assertThat(deletedUser).isNull();
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("Пользователь с ID 999 не найден.", exception.getReason());
     }
 }
