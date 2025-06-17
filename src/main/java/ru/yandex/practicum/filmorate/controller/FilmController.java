@@ -63,7 +63,7 @@ public class FilmController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<Film>> findAll() {
         log.info("Получение списка всех фильмов");
-        List<Film> films = (List<Film>) filmService.getAllFilms();
+        List<Film> films = filmService.getAllFilms();
         return ResponseEntity.ok(films);
     }
 

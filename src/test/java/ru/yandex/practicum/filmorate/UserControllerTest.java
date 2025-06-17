@@ -70,9 +70,7 @@ class UserControllerTest {
         user.setId(999);
         when(userService.getUserById(999)).thenReturn(null);
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            userController.update(user);
-        });
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userController.update(user));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertEquals("Пользователь с ID 999 не найден.", exception.getReason());
@@ -91,9 +89,7 @@ class UserControllerTest {
     void shouldThrowExceptionWhenDeletingNonExistentUser() {
         doThrow(new ResourceNotFoundException("Пользователь с ID 999 не найден.")).when(userService).deleteUser(999);
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            userController.delete(999);
-        });
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userController.delete(999));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertEquals("Пользователь с ID 999 не найден.", exception.getReason());

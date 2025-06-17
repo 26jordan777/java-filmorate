@@ -1,10 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ResourceNotFoundException;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -15,12 +16,9 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -45,7 +43,7 @@ public class UserController {
 
         User existingUser = userService.getUserById(updatedUser.getId());
         if (existingUser == null) {
-            throw new ValidationException("Пользователь с ID " + updatedUser.getId() + " не найден.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с ID " + updatedUser.getId() + " не найден.");
         }
 
         User updatedUserResponse = userService.updateUser(updatedUser);
@@ -62,7 +60,7 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<User>> findAll() {
         log.info("Получение списка всех пользователей");
         List<User> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
@@ -71,35 +69,24 @@ public class UserController {
     @GetMapping("/{id}/friends")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<User>> getFriends(@PathVariable("id") Long userId) throws ValidationException {
-        log.info("Вызван метод GET /users/{id}/friends с id = {}", userId);
+        log.info("Получение списка друзей пользователя с ID: {}", userId);
         List<User> userFriends = userService.getFriends(userId);
         return ResponseEntity.ok(userFriends);
     }
 
-    @GetMapping("/{id}/friends/common/{otherId}")
+    @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<User>> getFriendsCommonOther(@PathVariable("id") Long userId, @PathVariable("otherId") Long otherId) throws ValidationException {
-        log.info("Вызван метод GET /users/{id}/friends/common/{otherId} с id = {} и otherId = {}", userId, otherId);
-        List<User> commonFriends = userService.getFriendsCommonOther(userId, otherId);
-        return ResponseEntity.ok(commonFriends);
-    }
-
-    @PutMapping("/{userId}/friends/{friendId}")
-    public ResponseEntity<Void> addFriend(@PathVariable Long userId, @PathVariable Long friendId) {
-        if (userService.getUserById(userId) == null || userService.getUserById(friendId) == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-        }
-
+    public ResponseEntity<Void> addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
+        log.info("Добавление друга с ID {} для пользователя с ID {}", friendId, userId);
         userService.addFriend(userId, friendId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
-        log.info("Вызван метод DELETE /users/{id}/friends/{friendId} с id = {} и friendId = {}", userId, friendId);
+    public ResponseEntity<Void> removeFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
+        log.info("Удаление друга с ID {} у пользователя с ID {}", friendId, userId);
         userService.removeFriend(userId, friendId);
-        log.info("Метод DELETE /users/{id}/friends/{friendId} успешно выполнен");
+        return ResponseEntity.noContent().build();
     }
 }
