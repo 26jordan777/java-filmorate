@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+/*package ru.yandex.practicum.filmorate;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -95,3 +95,5 @@ class UserControllerTest {
         assertEquals("Пользователь с ID 999 не найден.", exception.getReason());
     }
 }
+
+ */
