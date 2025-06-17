@@ -86,12 +86,13 @@ public class UserController {
 
     @PutMapping("/{userId}/friends/{friendId}")
     public ResponseEntity<Void> addFriend(@PathVariable Long userId, @PathVariable Long friendId) {
-        try {
-            userService.addFriend(userId, friendId);
-            return ResponseEntity.ok().build();
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        if (userService.getUserById(userId) == null || userService.getUserById(friendId) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
         }
+
+        userService.addFriend(userId, friendId);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
