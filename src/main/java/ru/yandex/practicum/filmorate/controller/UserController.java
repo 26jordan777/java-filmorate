@@ -89,4 +89,11 @@ public class UserController {
         userService.removeFriend(userId, friendId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{userId}/friends/common/{otherId}")
+    public ResponseEntity<List<User>> getCommonFriends(@PathVariable Long userId, @PathVariable Long otherId) {
+        List<User> commonFriends = userService.getFriendsCommonOther(userId, otherId);
+        return ResponseEntity.ok(commonFriends);
+    }
+
 }

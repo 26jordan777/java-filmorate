@@ -6,12 +6,14 @@
     birthday DATE NOT NULL
 );
 
-create TABLE IF NOT EXISTS FILMS (
-    id BIGSERIAL PRIMARY KEY,
+CREATE TABLE FILMS (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(200),
     release_date DATE NOT NULL,
-    duration BIGINT NOT NULL
+    duration BIGINT NOT NULL,
+    mpa_id BIGINT,
+    FOREIGN KEY (mpa_id) REFERENCES MPA(id)
 );
 
 create TABLE IF NOT EXISTS GENRES (
