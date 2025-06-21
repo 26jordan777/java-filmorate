@@ -22,8 +22,10 @@ public class FilmController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Film> create(@Valid @RequestBody Film film) throws ValidationException {
-        log.info("Получен запрос на создание фильма: {}", film);
+    public ResponseEntity<Film> create(@Valid @RequestBody Film film) {
+        if (film.getName() == null || film.getName().isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
         Film createdFilm = filmService.addFilm(film);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);
     }
@@ -61,7 +63,7 @@ public class FilmController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<Film>> findAll() {
         log.info("Получение списка всех фильмов");
-        List<Film> films = (List<Film>) filmService.getAllFilms();
+        List<Film> films = filmService.getAllFilms();
         return ResponseEntity.ok(films);
     }
 

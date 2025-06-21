@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -14,12 +16,9 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -37,24 +36,31 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PutMapping()
+    @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<User> update(@Valid @RequestBody User updatedUser) throws ValidationException {
         log.info("Обновление пользователя с ID: {}", updatedUser.getId());
-        User user = userService.updateUser(updatedUser);
-        return ResponseEntity.ok(user);
+
+        User existingUser = userService.getUserById(updatedUser.getId());
+        if (existingUser == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с ID " + updatedUser.getId() + " не найден.");
+        }
+
+        User updatedUserResponse = userService.updateUser(updatedUser);
+        return ResponseEntity.ok(updatedUserResponse);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable long id) {
+    public ResponseEntity<Void> delete(@PathVariable long id) {
         log.info("Удаление пользователя с ID: {}", id);
         userService.deleteUser(id);
+        return null;
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<User>> findAll() {
         log.info("Получение списка всех пользователей");
         List<User> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
@@ -63,32 +69,31 @@ public class UserController {
     @GetMapping("/{id}/friends")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<User>> getFriends(@PathVariable("id") Long userId) throws ValidationException {
-        log.info("Вызван метод GET /users/{id}/friends с id = {}", userId);
+        log.info("Получение списка друзей пользователя с ID: {}", userId);
         List<User> userFriends = userService.getFriends(userId);
         return ResponseEntity.ok(userFriends);
-    }
-
-    @GetMapping("/{id}/friends/common/{otherId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<User>> getFriendsCommonOther(@PathVariable("id") Long userId, @PathVariable("otherId") Long otherId) throws ValidationException {
-        log.info("Вызван метод GET /users/{id}/friends/common/{otherId} с id = {} и otherId = {}", userId, otherId);
-        List<User> commonFriends = userService.getFriendsCommonOther(userId, otherId);
-        return ResponseEntity.ok(commonFriends);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
-        log.info("Вызван метод PUT /users/{id}/friends/{friendId} с id = {} и friendId = {}", userId, friendId);
+        log.info("Добавление друга с ID {} для пользователя с ID {}", friendId, userId);
         userService.addFriend(userId, friendId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
-        log.info("Вызван метод DELETE /users/{id}/friends/{friendId} с id = {} и friendId = {}", userId, friendId);
+    public ResponseEntity<Void> removeFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) throws ValidationException {
+        log.info("Удаление друга с ID {} у пользователя с ID {}", friendId, userId);
         userService.removeFriend(userId, friendId);
-        log.info("Метод DELETE /users/{id}/friends/{friendId} успешно выполнен");
+        return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{userId}/friends/common/{otherId}")
+    public ResponseEntity<List<User>> getCommonFriends(@PathVariable Long userId, @PathVariable Long otherId) {
+        List<User> commonFriends = userService.getFriendsCommonOther(userId, otherId);
+        return ResponseEntity.ok(commonFriends);
+    }
+
 }

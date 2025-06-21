@@ -2,12 +2,14 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.exception.ResourceNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+
 
 import java.time.LocalDate;
 import java.util.*;
@@ -15,22 +17,22 @@ import java.util.*;
 @Service
 @Slf4j
 public class UserService {
-    private final UserStorage userStorage;
+    private final UserDbStorage userDbStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserService(@Qualifier("UserDbStorage") UserDbStorage userDbStorage) {
+        this.userDbStorage = userDbStorage;
     }
 
     public User addUser(User user) throws ValidationException {
         validateUser(user);
-        User addedUser = userStorage.addUser(user);
+        User addedUser = userDbStorage.addUser(user);
         log.info("Пользователь добавлен: {}", addedUser);
         return addedUser;
     }
 
     public User getUserById(long id) {
-        User user = userStorage.getUserById(id);
+        User user = userDbStorage.getUserById(id);
         if (user == null) {
             log.error("Пользователь с ID {} не найден.", id);
             throw new ResourceNotFoundException("Пользователь с ID " + id + " не найден.");
@@ -41,34 +43,34 @@ public class UserService {
     public User updateUser(User user) throws ValidationException {
         validateUser(user);
 
-        User existingUser = userStorage.getUserById(user.getId());
+        User existingUser = userDbStorage.getUserById(user.getId());
         if (existingUser == null) {
             log.error("Пользователь с ID {} не найден для обновления.", user.getId());
             throw new ResourceNotFoundException("Пользователь с ID " + user.getId() + " не найден.");
         }
 
-        User updatedUser = userStorage.updateUser(user);
+        User updatedUser = userDbStorage.updateUser(user);
         log.info("Пользователь обновлен: {}", updatedUser);
         return updatedUser;
     }
 
     public void deleteUser(long id) {
-        userStorage.deleteUser(id);
+        userDbStorage.deleteUser(id);
         log.info("Пользователь с ID {} удален.", id);
     }
 
     public List<User> getAllUsers() {
-        return new ArrayList<>(userStorage.getAllUsers());
+        return new ArrayList<>(userDbStorage.getAllUsers());
     }
 
     public List<User> getFriends(Long userId) throws ValidationException {
-        User user = userStorage.getUserById(userId);
+        User user = userDbStorage.getUserById(userId);
         if (user == null) {
             throw new ResourceNotFoundException("Пользователь с ID " + userId + " не найден.");
         }
         List<User> friends = new ArrayList<>();
         for (Long friendId : user.getFriends()) {
-            User friend = userStorage.getUserById(friendId);
+            User friend = userDbStorage.getUserById(friendId);
             if (friend != null) {
                 friends.add(friend);
             }
@@ -77,8 +79,8 @@ public class UserService {
     }
 
     public List<User> getFriendsCommonOther(Long userId, Long otherId) throws ValidationException {
-        User user = userStorage.getUserById(userId);
-        User otherUser = userStorage.getUserById(otherId);
+        User user = userDbStorage.getUserById(userId);
+        User otherUser = userDbStorage.getUserById(otherId);
         if (user == null || otherUser == null) {
             throw new ResourceNotFoundException("Один из пользователей не найден.");
         }
@@ -86,7 +88,7 @@ public class UserService {
         commonFriendIds.retainAll(otherUser.getFriends());
         List<User> commonFriends = new ArrayList<>();
         for (Long friendId : commonFriendIds) {
-            User commonFriend = userStorage.getUserById(friendId);
+            User commonFriend = userDbStorage.getUserById(friendId);
             if (commonFriend != null) {
                 commonFriends.add(commonFriend);
             }
@@ -96,8 +98,8 @@ public class UserService {
 
 
     public void removeFriend(Long userId, Long friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
+        User user = userDbStorage.getUserById(userId);
+        User friend = userDbStorage.getUserById(friendId);
 
         if (user == null || friend == null) {
             throw new ResourceNotFoundException("Один из пользователей не найден.");
@@ -105,8 +107,8 @@ public class UserService {
 
         user.removeFriend(friendId);
         friend.removeFriend(userId);
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
+        userDbStorage.updateUser(user);
+        userDbStorage.updateUser(friend);
     }
 
     private void validateUser(User user) throws ValidationException {
@@ -124,9 +126,9 @@ public class UserService {
         }
     }
 
-    public void addFriend(Long userId, Long friendId) throws ValidationException {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
+    public void addFriend(Long userId, Long friendId) {
+        User user = userDbStorage.getUserById(userId);
+        User friend = userDbStorage.getUserById(friendId);
 
         if (user == null) {
             throw new ResourceNotFoundException("Пользователь с ID " + userId + " не найден.");
@@ -137,7 +139,8 @@ public class UserService {
 
         user.addFriend(friendId);
         friend.addFriend(userId);
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
+
+        userDbStorage.updateUser(user);
+        userDbStorage.updateUser(friend);
     }
 }
