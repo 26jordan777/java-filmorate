@@ -126,11 +126,21 @@ public class UserService {
         }
     }
 
-    public void addFriend(Long userId, Long friendId) throws ValidationException {
+    public void addFriend(Long userId, Long friendId) {
+        User user = userDbStorage.getUserById(userId);
+        User friend = userDbStorage.getUserById(friendId);
 
-        if (userDbStorage.getUserById(userId) == null || userDbStorage.getUserById(friendId) == null) {
-            throw new ResourceNotFoundException("Один из пользователей не найден.");
+        if (user == null) {
+            throw new ResourceNotFoundException("Пользователь с ID " + userId + " не найден.");
         }
-        userDbStorage.addFriend(userId, friendId);
+        if (friend == null) {
+            throw new ResourceNotFoundException("Пользователь с ID " + friendId + " не найден.");
+        }
+
+        user.addFriend(friendId);
+        friend.addFriend(userId);
+
+        userDbStorage.updateUser(user);
+        userDbStorage.updateUser(friend);
     }
 }
