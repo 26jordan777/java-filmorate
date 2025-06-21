@@ -31,6 +31,9 @@ public class FilmService {
 
     public Film addFilm(Film film) throws ValidationException {
         validateFilm(film);
+        if (film.getMpaRating() != null) {
+            film.setMpaRating(film.getMpaRating());
+        }
         return filmStorage.addFilm(film);
     }
 
@@ -49,7 +52,9 @@ public class FilmService {
         }
 
         validateFilm(updatedFilm);
-
+        if (updatedFilm.getMpaRating() != null) {
+            updatedFilm.setMpaRating(updatedFilm.getMpaRating());
+        }
         return filmStorage.updateFilm(updatedFilm);
     }
 
